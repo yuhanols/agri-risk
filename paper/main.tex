@@ -1,0 +1,204 @@
+\documentclass[12pt]{article}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{float}
+
+\doublespacing
+
+% ============================================================
+% Title
+% ============================================================
+\title{Weather Shocks, Supply Dynamics, and Price Persistence: \\ Evidence from U.S.\ Lettuce Markets}
+\author{Yuhan Wang\thanks{Department of Agricultural and Resource Economics, University of California, Davis. Email: yhnwang@ucdavis.edu.}}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+TODO
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Market Background}
+\label{sec:background}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Data}
+\label{sec:data}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Methodology and Empirical Strategy}
+\label{sec:methods}
+% ============================================================
+
+This section describes the empirical framework. Section~\ref{subsec:dual_layer} explains the dual-layer approach that motivates the two datasets. Sections~\ref{subsec:market_model}--\ref{subsec:district_panel} present the three model layers. Section~\ref{subsec:features} describes the feature construction, and Section~\ref{subsec:validation} lays out the out-of-sample validation strategy.
+
+% ------------------------------------------------------------
+\subsection{Dual-Layer Design}
+\label{subsec:dual_layer}
+% ------------------------------------------------------------
+
+The U.S.\ lettuce market spans six production districts across California and Arizona, but not all districts report FOB prices every week. In particular, the three smaller districts (Santa Maria, Oxnard, San Joaquin Valley) have substantial gaps in price reporting. A district-level panel of all six districts would have a price coverage rate of only 78.4\%, making it unsuitable for time-series prediction.
+
+We address this by constructing two datasets from the same underlying weekly panel. The first aggregates all six districts into a single market-level time series. The second retains the three core districts (Salinas-Watsonville, Western Arizona, and Imperial Valley) as a panel.
+
+\textbf{Dataset A: Market-level aggregate.} Each week, we compute a shipment-weighted average price across all districts that report a price:
+\begin{equation}
+\label{eq:weighted_price}
+P_t = \frac{\sum_{i} V_{it} \cdot P_{it}}{\sum_{i} V_{it}},
+\end{equation}
+where $V_{it}$ is iceberg lettuce shipment volume from district $i$ in week $t$, and the sum runs over districts with nonmissing prices. Weather variables are aggregated analogously, weighted by shipment volume. This yields 849 weekly observations with 98.2\% price coverage. The coverage ratio,
+\begin{equation}
+\label{eq:coverage}
+C_t = \frac{\sum_{i \in \text{priced}} V_{it}}{\sum_{i} V_{it}},
+\end{equation}
+measures the share of total shipments for which we observe a price, and serves as a data quality indicator in the models.
+
+\textbf{Dataset B: District-level panel.} We retain the three districts that have both meaningful shipment volume and reasonable price coverage throughout the sample: Salinas-Watsonville (the dominant California district), Western Arizona (the primary winter production region), and Imperial Valley (a supplementary desert district). This panel has 1,466 observations with 78.4\% price coverage.
+
+The two datasets serve different purposes. Dataset A is used for price and volume prediction, where complete coverage and a long, uninterrupted time series are important. Dataset B is used for causal identification of weather effects, where cross-district variation in weather exposure provides the identifying variation.
+
+% ------------------------------------------------------------
+\subsection{Market-Level Prediction Model}
+\label{subsec:market_model}
+% ------------------------------------------------------------
+
+The market-level price model takes the form
+\begin{equation}
+\label{eq:market_level}
+P_t = \alpha + \boldsymbol{\beta}_1' \mathbf{W}_t + \boldsymbol{\beta}_2' \mathbf{L}_t + \boldsymbol{\beta}_3' \mathbf{S}_t + \boldsymbol{\beta}_4' \mathbf{X}_t + \varepsilon_t,
+\end{equation}
+where $P_t$ is the shipment-weighted iceberg lettuce FOB price in week $t$, $\mathbf{W}_t$ is a vector of contemporaneous weather variables, $\mathbf{L}_t$ contains lagged price and volume terms, $\mathbf{S}_t$ includes seasonal indicators (month and week of year), and $\mathbf{X}_t$ contains other controls such as coverage ratio and the number of active districts.
+
+We estimate Equation~\eqref{eq:market_level} by OLS with heteroskedasticity-robust standard errors (HC1). We also estimate the same specification using XGBoost and Random Forest as benchmarks for nonlinear alternatives.
+
+The XGBoost model uses conservative hyperparameters to limit overfitting: 200 trees, maximum depth 3, learning rate 0.03, subsample ratio 0.7, and L1/L2 regularization ($\alpha = 1.0$, $\lambda = 5.0$). The Random Forest uses 500 trees, maximum depth 6, and minimum leaf size 10. These are deliberately restrictive settings, since the goal is not to maximize in-sample fit but to evaluate whether nonlinear methods can improve on OLS out of sample.
+
+% ------------------------------------------------------------
+\subsection{Change Model}
+\label{subsec:change_model}
+% ------------------------------------------------------------
+
+Lettuce prices are highly persistent: the first-order autocorrelation exceeds 0.9, and in a level regression, the lagged price alone explains most of the variation. This persistence can mask the effects of other variables, including weather. To isolate the role of weather shocks more directly, we also estimate models for the week-to-week price change:
+\begin{equation}
+\label{eq:change_model}
+\Delta P_t = P_t - P_{t-1} = \alpha + \boldsymbol{\gamma}' \mathbf{W}_t + \boldsymbol{\delta}' \mathbf{M}_t + u_t,
+\end{equation}
+where $\mathbf{W}_t$ is the same weather vector and $\mathbf{M}_t$ includes volume, coverage, seasonal indicators, and other market controls. Lagged prices are excluded from the right-hand side because differencing has already removed the autoregressive component.
+
+If weather effects are ``hidden'' by price persistence in the level model, they should become more prominent in the change model. Comparing the two specifications provides a direct test of this hypothesis.
+
+% ------------------------------------------------------------
+\subsection{District-Level Panel}
+\label{subsec:district_panel}
+% ------------------------------------------------------------
+
+The district panel allows us to exploit cross-sectional variation in weather exposure that is lost in the market-level aggregate. A freeze event in Yuma, for example, affects the Yuma price directly but is diluted when averaged with Salinas, which may not experience a freeze in the same week.
+
+Our identification assumption is that short-run weather variation is exogenous to demand. Weather affects prices through its effect on local supply (crop damage, harvest delays), not through shifts in consumer demand for lettuce. This is plausible for week-to-week weather fluctuations, though not necessarily for long-run climate trends.
+
+The district panel specification is
+\begin{equation}
+\label{eq:district_change}
+\Delta P_{it} = \boldsymbol{\phi}' \mathbf{W}_{it} + \alpha_i + \mu_q + \eta_{iq} + \nu_{it},
+\end{equation}
+where $\Delta P_{it}$ is the week-over-week price change for district $i$ in week $t$, $\mathbf{W}_{it}$ is the local weather vector, $\alpha_i$ is a district fixed effect, $\mu_q$ is a quarter fixed effect, and $\eta_{iq}$ captures district-by-season interactions (e.g., Arizona in winter). Standard errors are clustered at the district level.
+
+We also estimate a level specification that includes lagged prices on the right-hand side, following the same fixed-effect structure:
+\begin{equation}
+\label{eq:district_level}
+P_{it} = \boldsymbol{\phi}' \mathbf{W}_{it} + \boldsymbol{\psi}' \mathbf{L}_{it} + \alpha_i + \mu_q + \eta_{iq} + \nu_{it}.
+\end{equation}
+Comparing coefficients across the change and level specifications at the district level serves the same purpose as at the market level: it reveals whether price persistence attenuates the estimated weather effects.
+
+% ------------------------------------------------------------
+\subsection{Feature Construction}
+\label{subsec:features}
+% ------------------------------------------------------------
+
+All models draw on the same set of engineered features, constructed from the three raw data sources.
+
+\textbf{Weather variables.} Contemporaneous weekly weather includes maximum and minimum temperature ($tmax$, $tmin$), total precipitation ($ppt$), and diurnal range ($tmax - tmin$). Three binary extreme-weather indicators capture tail events: $freeze\_risk$ equals one if the minimum daily temperature falls below 32\textdegree F during the week, $extreme\_heat$ equals one if the maximum daily temperature exceeds 100\textdegree F, and $heavy\_rain$ equals one if weekly precipitation exceeds 25mm.
+
+\textbf{Lagged variables.} For prices, shipment volume, temperature, and precipitation, we include lags at 1, 2, and 4 weeks. The 1-week lag captures short-run persistence, the 2-week lag reflects the approximate harvest cycle for lettuce, and the 4-week lag captures monthly patterns.
+
+\textbf{Rolling averages.} Four-week rolling means of volume, temperature, and precipitation capture the recent background state of the market and weather, smoothing out single-week noise.
+
+\textbf{Coverage and market structure.} The coverage ratio $C_t$ and the number of active districts $n_t$ both enter as controls, capturing the reliability of the price signal and the breadth of active production.
+
+\textbf{Seasonal indicators.} Month and week-of-year enter as numeric variables to capture the strong seasonal pattern in lettuce production and pricing.
+
+% ------------------------------------------------------------
+\subsection{Validation Strategy}
+\label{subsec:validation}
+% ------------------------------------------------------------
+
+All out-of-sample results use an expanding-window approach. For each test year $\tau$ from 2014 to 2026, we train on all data from years prior to $\tau$ and evaluate on year $\tau$. This mimics a real forecasting setting: the model is always estimated on historical data only.
+
+We require a minimum of four years of training data, so the first test year is 2014 (trained on 2010--2013). The expanding window is preferred over a rolling window because the sample is relatively short and additional training data improves stability. We verify this choice in the diagnostics section by comparing expanding and rolling window performance.
+
+The primary evaluation metric is root mean squared error (RMSE) in price levels, reported both as a year-by-year series and as an average across all test years. For change models, we convert predictions back to price levels before computing RMSE so that all models are evaluated on the same scale. The naive baseline predicts $\hat{P}_t = P_{t-1}$, which is equivalent to predicting zero price change.
+
+% ============================================================
+\section{Results}
+\label{sec:results}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Mechanism: Weather, Supply, and Price}
+\label{sec:mechanism}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Robustness}
+\label{sec:robustness}
+% ============================================================
+
+TODO
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ============================================================
+
+TODO
+
+% ============================================================
+% References
+% ============================================================
+\bibliographystyle{aer}
+\bibliography{references}
+
+\end{document}
