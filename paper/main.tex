@@ -26,7 +26,7 @@
 
 \begin{abstract}
 \noindent
-TODO
+I construct a weekly data pipeline integrating USDA shipment data, FOB prices, and weather data to study climate-driven supply and price dynamics in U.S.\ lettuce markets (2010--2026). Using a dual-layer approach that combines market-level aggregation for prediction with district-level panels for causal identification, I find three results. First, OLS outperforms XGBoost and Random Forest for price prediction (RMSE \$4.36 vs.\ \$6.67 and \$6.81), because lettuce price dynamics are dominated by a linear autoregressive process. Second, weather effects on prices are real but masked by price persistence: frost events increase district-level weekly prices by \$2.33 ($p < 0.001$), an effect that is diluted to insignificance in market-level aggregates. Third, all findings replicate with Romaine lettuce. These results demonstrate that downstream market outcomes can identify weather-driven supply responses even without high-frequency yield data.
 \end{abstract}
 
 \newpage
@@ -38,21 +38,104 @@ TODO
 \label{sec:intro}
 % ============================================================
 
-TODO
+Fresh produce supply chains are exposed to weather risk, but translating weather shocks into quantitative supply and price signals remains difficult. For most fresh vegetables, the data infrastructure that enables high-frequency crop monitoring in grain markets simply does not exist. There are no futures contracts, no weekly crop progress reports, and no county-level yield estimates. Buyers, distributors, and supply chain managers rely instead on trade reports, informal market intelligence, and experience.
+
+This paper studies how weather shocks affect supply and prices in the U.S.\ iceberg lettuce market. Lettuce is the largest fresh vegetable crop in the United States by volume and is produced year-round through a seasonal rotation between California (spring through fall) and Arizona (winter). We construct a weekly data pipeline that integrates USDA truck shipment volumes, FOB shipping point prices, and gridded weather data from PRISM, covering six production districts over the period 2010--2026.
+
+Our empirical strategy uses a dual-layer modeling approach. At the market level, we aggregate all districts into a single weekly time series and estimate price and volume prediction models using OLS, XGBoost, and Random Forest. At the district level, we retain a three-district panel and use fixed effects to identify the causal effect of local weather shocks on prices. The market-level models are designed for prediction; the district-level models are designed for identification. Both are necessary because aggregation improves data coverage (from 78\% to 98\% of weeks with observed prices) but dilutes the weather signal.
+
+Three main findings emerge. First, OLS consistently outperforms tree-based machine learning methods across all prediction tasks, including price levels, price changes, and shipment volume. The best market-level price model achieves an out-of-sample RMSE of \$4.36, a 15\% improvement over a naive autoregressive baseline. XGBoost and Random Forest perform worse than the baseline in level models and offer no improvement in change models. The lettuce price process is dominated by a strong autoregressive component, and the residual weather-price relationship is approximately linear. Nonlinear methods add complexity without improving accuracy and are particularly fragile during extreme market events.
+
+Second, weather effects on prices are real but hidden by price persistence. In level models, the one-week lagged price alone accounts for nearly half of total feature importance, leaving weather variables with little apparent explanatory power. When we model week-to-week price changes instead, removing the autoregressive component by construction, weather variables become substantially more important. At the district level, a frost event increases the local weekly price by \$2.33 ($p < 0.001$), but this effect is diluted to insignificance in the market-level aggregate. The mechanism runs from weather to local supply disruption to local price increase, which then persists through the autoregressive structure of the market.
+
+Third, all results are robust across lettuce varieties. Replicating the analysis with Romaine lettuce produces consistent coefficient signs and comparable, in fact lower, prediction errors (RMSE of \$2.61 vs.\ \$4.36 for Iceberg).
+
+This paper contributes to several literatures. Within agricultural economics, it demonstrates that downstream market outcomes, shipment volumes and wholesale prices, can identify weather-driven supply responses even in the absence of production or yield data. This approach may be applicable to other perishable crops where high-frequency yield data are unavailable. The finding that simple linear models dominate tree-based methods contributes to the growing applied econometrics literature on when machine learning improves on traditional methods, and when it does not. Finally, the dual-layer design, combining aggregation for prediction with disaggregation for identification, offers a practical template for settings where data coverage and causal identification require different levels of spatial aggregation.
+
+The rest of the paper is organized as follows. Section~\ref{sec:background} describes the institutional structure of the U.S.\ lettuce market. Section~\ref{sec:data} presents the data sources and variable construction. Section~\ref{sec:methods} lays out the empirical strategy. Section~\ref{sec:results} reports the main results. Section~\ref{sec:mechanism} discusses the mechanism linking weather, supply, and prices. Section~\ref{sec:robustness} presents robustness checks, and Section~\ref{sec:conclusion} concludes.
 
 % ============================================================
 \section{Market Background}
 \label{sec:background}
 % ============================================================
 
-TODO
+The United States produces roughly 3.5 million tons of lettuce annually, with California and Arizona accounting for over 95\% of domestic production. The market is organized around a seasonal geographic rotation between two primary production regions.
+
+\textbf{Salinas-Watsonville, California} is the dominant production district. Located in the Salinas Valley on the central California coast, it benefits from a mild maritime climate well suited to lettuce during the spring, summer, and fall months (roughly April through November, corresponding to weeks 15--50 of the year). Salinas accounts for the largest share of national shipments during its active season.
+
+\textbf{Western Arizona (Yuma)} takes over during the winter months (roughly November through March, weeks 45--15). The Yuma region's warm desert climate allows lettuce production when Salinas is too cold. Yuma ships volumes comparable to Salinas during its peak winter weeks.
+
+\textbf{Imperial Valley, California} serves as a supplementary desert production district, with a seasonal pattern similar to Yuma but smaller volumes. Three other California districts, Santa Maria, Oxnard, and San Joaquin Valley, contribute smaller and more sporadic volumes.
+
+The annual rotation between California and Arizona is primarily calendar-driven and follows the same pattern year after year. Production transitions occur around weeks 15--20 (spring, as Salinas ramps up and Arizona winds down) and weeks 45--50 (fall, as Salinas winds down and Arizona ramps up). These transition periods are associated with temporary supply contractions and elevated price volatility, as the market shifts between regions.
+
+Lettuce has a short growing cycle of approximately 60 to 90 days from planting to harvest. Unlike annual grain crops, lettuce fields are harvested on a continuous, rolling basis throughout the growing season. A single field may be replanted multiple times per year. This means there is no single ``harvest event'' that determines the annual crop size. Instead, supply in any given week depends on planting decisions made two to three months earlier, current growing conditions, and the pace of harvest operations.
+
+This production structure has an important implication for empirical research. High-frequency yield data, which are available for many grain crops at the county level, do not exist for lettuce. There is no weekly or even monthly measure of lettuce production by district. Shipment data, which record the volume of lettuce loaded onto trucks at the point of origin, provide the closest available proxy. Because lettuce is highly perishable, with a shelf life of roughly one to two weeks, there is minimal storage and nearly all production is shipped promptly after harvest.
 
 % ============================================================
 \section{Data}
 \label{sec:data}
 % ============================================================
 
-TODO
+% ------------------------------------------------------------
+\subsection{Sources}
+\label{subsec:sources}
+% ------------------------------------------------------------
+
+We combine three publicly available data sources covering January 2010 through April 2026.
+
+\textbf{Shipment volume.} Weekly truck shipment reports from the USDA Agricultural Marketing Service (AMS) record the volume of each commodity shipped by truck from each production district. These reports are the best available high-frequency measure of lettuce supply. Unlike grain crops, where county-level yield data are published annually, lettuce is harvested continuously within each growing season, and no comparable high-frequency production data exist. Shipment volume serves as a proxy for production: because lettuce is highly perishable and cannot be stored for more than a few days, nearly all production is shipped within the week it is harvested.
+
+\textbf{Prices.} Daily FOB (free on board) shipping point prices from USDA Market News report the price at which lettuce is sold at the point of origin, before transportation costs. We use FOB prices rather than retail prices because they more directly reflect supply conditions at the production level. FOB prices are reported by district, commodity, and package type. We aggregate daily prices to weekly averages.
+
+\textbf{Weather.} Daily temperature and precipitation data come from the PRISM Climate Group at Oregon State University, which produces gridded climate data at 4km resolution for the contiguous United States. For each production district, we extract daily maximum temperature, minimum temperature, and precipitation at the district centroid and aggregate to weekly summaries.
+
+% ------------------------------------------------------------
+\subsection{Production Districts}
+\label{subsec:districts}
+% ------------------------------------------------------------
+
+The data cover six lettuce production districts in California and Arizona: Salinas-Watsonville, Western Arizona (Yuma), Imperial Valley, Santa Maria, Oxnard, and San Joaquin Valley. Together these districts account for the vast majority of U.S.\ lettuce production.
+
+Not all districts are active year-round or report prices consistently. Salinas-Watsonville, the largest district, ships in 626 of the 849 sample weeks and reports prices in 82\% of those weeks. Western Arizona ships in 454 weeks (primarily the winter months) with 77\% price coverage. The three smaller districts have much lower coverage: Oxnard reports prices in only 1\% of its active weeks, Santa Maria in 65\%, and San Joaquin Valley in 71\%. This uneven coverage motivates the dual-layer approach described in Section~\ref{subsec:dual_layer}.
+
+% ------------------------------------------------------------
+\subsection{Variable Construction}
+\label{subsec:construction}
+% ------------------------------------------------------------
+
+\textbf{Market-level price.} For each week, we compute a shipment-weighted average FOB price across all districts that report a price (Equation~\ref{eq:weighted_price}). Weighting by shipment volume ensures that districts with larger production have proportionally greater influence on the market price. The coverage ratio (Equation~\ref{eq:coverage}) measures the fraction of total weekly shipments for which we observe a price. The mean coverage ratio is 0.933, and 98.2\% of weeks have at least one district reporting a price.
+
+\textbf{Market-level weather.} Weather variables are aggregated to the market level using the same shipment weights. This means that the market-level temperature in a given week reflects conditions in whichever districts are actively shipping, not a simple geographic average. When production shifts from Salinas to Yuma in the winter, the market-level weather automatically shifts to reflect Yuma conditions.
+
+\textbf{Extreme weather indicators.} From the daily weather data, we construct three binary indicators for each district-week: $freeze\_risk$ (any day with minimum temperature below 32\textdegree F), $extreme\_heat$ (any day with maximum temperature above 100\textdegree F), and $heavy\_rain$ (weekly precipitation above 25mm). At the market level, these indicators equal one if any active district experiences the event.
+
+% ------------------------------------------------------------
+\subsection{Summary Statistics}
+\label{subsec:summary}
+% ------------------------------------------------------------
+
+Table~\ref{tab:summary} reports summary statistics for the market-level dataset. The mean weekly iceberg lettuce FOB price is \$16.27 with a standard deviation of \$11.80. The distribution is right-skewed: the median price is \$12.30, and the maximum is \$94.33 (reached during the 2022 INSV outbreak). Mean weekly shipment volume is 4,422 tons. Extreme weather events are infrequent at the market level: freeze risk occurs in 14 of 849 weeks (1.6\%), extreme heat in 6 weeks (0.7\%), and heavy rain in 68 weeks (8.0\%).
+
+\begin{table}[H]
+\centering
+\caption{Summary statistics: Market-level dataset (849 weeks, 2010--2026)}
+\label{tab:summary}
+\begin{tabular}{lrrrrr}
+\toprule
+Variable & Mean & SD & Min & Median & Max \\
+\midrule
+Price (\$/unit) & 16.27 & 11.80 & 5.99 & 12.30 & 94.33 \\
+Volume (tons) & 4,422 & 749 & 2,313 & 4,411 & 6,993 \\
+Coverage ratio & 0.933 & --- & 0.000 & --- & 1.000 \\
+Tmax (\textdegree F) & 21.9 & 3.2 & --- & --- & --- \\
+Tmin (\textdegree F) & 10.4 & 2.5 & --- & --- & --- \\
+Precipitation (mm) & 1.95 & 5.93 & --- & --- & --- \\
+Active districts & 2.9 & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Methodology and Empirical Strategy}
@@ -172,28 +255,201 @@ The primary evaluation metric is root mean squared error (RMSE) in price levels,
 \label{sec:results}
 % ============================================================
 
-TODO
+% ------------------------------------------------------------
+\subsection{Market-Level Price Prediction}
+\label{subsec:price_prediction}
+% ------------------------------------------------------------
+
+Table~\ref{tab:model_comparison} reports average out-of-sample RMSE for all models across the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.12. The OLS level model with full features achieves \$4.36, a 14.8\% improvement over the naive baseline. This is the best-performing model in our comparison.
+
+Both tree-based methods perform worse than OLS in level models. XGBoost averages \$6.67 and Random Forest \$6.81, each substantially worse than the naive baseline. This result is not an artifact of hyperparameter choice. The conservative settings we use are designed to prevent overfitting, and the models do learn meaningful patterns in-sample. The problem is that lettuce prices are driven primarily by a strong autoregressive component, and tree-based models handle this poorly out of sample.
+
+The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost exploded to \$24.37 and Random Forest to \$23.83. The reason is structural: tree-based methods cannot extrapolate beyond the range of training data. Having never seen prices above roughly \$40 in prior years, they could not predict a price of \$94. OLS, by contrast, extrapolates linearly through the lagged price coefficient, which at least moves predictions in the right direction during extreme episodes.
+
+\begin{table}[H]
+\centering
+\caption{Out-of-sample model comparison: average RMSE (2014--2026)}
+\label{tab:model_comparison}
+\begin{tabular}{lrrr}
+\toprule
+Model & Avg RMSE (\$) & Avg MAE (\$) & vs.\ Naive \\
+\midrule
+Naive ($P_t = P_{t-1}$) & 5.12 & --- & baseline \\
+\addlinespace
+\textit{Level models} \\
+\quad OLS (full) & \textbf{4.36} & 3.14 & +14.8\% \\
+\quad XGBoost & 6.67 & 4.26 & $-$30.4\% \\
+\quad Random Forest & 6.81 & 4.32 & $-$33.2\% \\
+\addlinespace
+\textit{Change models} \\
+\quad OLS $\Delta P$ & 5.07 & 3.57 & +0.9\% \\
+\quad XGBoost $\Delta P$ & 5.12 & 3.56 & +0.0\% \\
+\quad Random Forest $\Delta P$ & 5.00 & 3.40 & +2.3\% \\
+\quad OLS log $\Delta P$ & 5.00 & 3.41 & +2.4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------
+\subsection{Price Persistence and Hidden Weather Effects}
+\label{subsec:persistence}
+% ------------------------------------------------------------
+
+In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.89. This single variable accounts for most of the model's explanatory power. Precipitation is statistically significant ($\hat{\beta} = 0.12$, $p = 0.01$), but its economic magnitude is small relative to the lagged price term.
+
+The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, the three estimation methods converge: OLS, XGBoost, and Random Forest all produce average RMSEs within a narrow range of \$5.00 to \$5.13. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
+
+Second, and more importantly, the relative importance of weather variables increases substantially. In the XGBoost level model, the three price lags together account for 47\% of total feature importance. Temperature ($tmax$) contributes only 2.4\%. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) gain as well. The weather signal was there all along; it was simply overwhelmed by price persistence in the level specification.
+
+% ------------------------------------------------------------
+\subsection{Volume Prediction}
+\label{subsec:volume}
+% ------------------------------------------------------------
+
+Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287 tons, a 38.0\% improvement over the naive baseline of 463 tons. XGBoost achieves 354 tons, better than naive but well behind OLS.
+
+Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ tons per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$ tons) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
+
+\begin{table}[H]
+\centering
+\caption{Volume prediction: average RMSE (expanding window, 2014--2026)}
+\label{tab:volume}
+\begin{tabular}{lrrr}
+\toprule
+Model & Avg RMSE (tons) & Avg MAE (tons) & vs.\ Naive \\
+\midrule
+Naive ($V_t = V_{t-1}$) & 463 & 347 & baseline \\
+OLS Level & \textbf{287} & 223 & +38.0\% \\
+XGBoost Level & 354 & 265 & +23.6\% \\
+OLS $\Delta V$ & 459 & 345 & +0.8\% \\
+XGBoost $\Delta V$ & 453 & 345 & +2.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Mechanism: Weather, Supply, and Price}
 \label{sec:mechanism}
 % ============================================================
 
-TODO
+The results in Section~\ref{sec:results} establish that weather matters for lettuce prices but that its effect is masked by price persistence in level models. This section uses the district-level panel to identify how weather operates, and to explain why the market-level aggregate understates weather effects.
+
+% ------------------------------------------------------------
+\subsection{District-Level Identification}
+\label{subsec:district_id}
+% ------------------------------------------------------------
+
+Table~\ref{tab:district_weather} reports weather coefficients from the district panel specifications described in Section~\ref{subsec:district_panel}. The change model (Equation~\ref{eq:district_change}) includes district fixed effects, quarter fixed effects, and district-by-season interactions. Standard errors are clustered at the district level.
+
+Freeze risk is the strongest and most robust weather predictor. In the change model, a week with at least one day below freezing is associated with a price increase of \$2.33 ($p < 0.001$). This estimate is stable across specifications: adding volume controls and lagged weather changes the coefficient only slightly, from \$2.33 to \$2.37 to \$2.24. Minimum temperature has a significant negative coefficient ($-\$0.15$ to $-\$0.17$ per degree Fahrenheit, $p < 0.01$), which is the continuous counterpart of the freeze risk indicator: colder weeks mean higher prices. Extreme heat is significant in the level specification (\$2.16, $p = 0.008$) but not in the change models, suggesting that heat effects operate over a slightly longer horizon than week-to-week changes can capture.
+
+\begin{table}[H]
+\centering
+\caption{District-level weather coefficients (Iceberg, OLS with clustered SE)}
+\label{tab:district_weather}
+\begin{tabular}{lrrrr}
+\toprule
+Variable & $\Delta P$ (M1) & $\Delta P$ + vol (M2) & + weather lags (M3) & Level (M4) \\
+\midrule
+freeze\_risk & 2.326$^{***}$ & 2.368$^{***}$ & 2.237$^{***}$ & 1.354 \\
+tmin\_avg & $-$0.164$^{**}$ & $-$0.169$^{***}$ & $-$0.145$^{***}$ & $-$0.128$^{***}$ \\
+extreme\_heat & 0.542 & 0.493 & 0.778 & 2.164$^{***}$ \\
+ppt\_total & 0.106 & 0.105 & 0.104 & 0.089 \\
+heavy\_rain & $-$0.914 & $-$0.919 & $-$0.824 & $-$2.124 \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$. All models include district FE, quarter FE,} \\
+\multicolumn{5}{l}{\footnotesize and district $\times$ season interactions. SE clustered by district.} \\
+\end{tabular}
+\end{table}
+
+The precipitation coefficient is positive but not statistically significant in any specification. This is somewhat surprising given that precipitation significantly predicts both price at the market level and volume. One possible explanation is that precipitation effects on price operate primarily through volume reductions at the market level, and the district panel, which does not aggregate across districts, captures a noisier version of this channel.
+
+% ------------------------------------------------------------
+\subsection{Why Level Models Mask Weather Effects}
+\label{subsec:why_masked}
+% ------------------------------------------------------------
+
+The comparison across columns in Table~\ref{tab:district_weather} illustrates how price persistence attenuates weather coefficients. Freeze risk is large and highly significant in all three change specifications but shrinks and loses significance in the level model (column M4). The level model includes lagged prices, which absorb much of the variation that weather explains in the change model. Since a freeze event raises prices this week, and lagged price carries that increase forward into next week, the level model attributes the persistent effect to the lag rather than to the freeze.
+
+This attenuation is not a statistical artifact. It reflects a real feature of the price process. Weather shocks are transitory, but their price effects persist through the autoregressive structure of the market. A freeze in Yuma raises the Yuma price, which feeds into the market-level price, which then carries forward through price persistence. The level model captures the persistence but not the initial cause. The change model captures the cause but not the persistence. Both are needed to tell the full story.
+
+The district panel also reveals heterogeneity that is lost in the market aggregate. A freeze event in Western Arizona has a direct and immediate effect on the local price, but when averaged with Salinas (which may not experience a freeze in the same week), the signal is diluted. This is why freeze risk is highly significant ($p < 0.001$) in the district panel but not significant in the market-level regressions. The dual-layer design is not just a convenience for handling missing data; it is necessary for identifying localized weather effects that aggregation would obscure.
+
+Taken together, the evidence supports the following mechanism. Weather shocks, particularly freezes and heat waves, reduce local supply in the affected district. The supply reduction raises the local FOB price. Because the market is spatially connected (buyers can substitute across districts to some extent), the price increase propagates to the market level. Once embedded in the market price, the shock persists through the autoregressive price process. The chain runs: weather $\to$ local supply $\to$ local price $\to$ market price $\to$ persistence.
 
 % ============================================================
 \section{Robustness}
 \label{sec:robustness}
 % ============================================================
 
-TODO
+% ------------------------------------------------------------
+\subsection{Romaine Lettuce}
+\label{subsec:romaine}
+% ------------------------------------------------------------
+
+We replicate the core analysis using Romaine lettuce prices instead of Iceberg. The market-level OLS model achieves an out-of-sample RMSE of \$2.61, compared to \$4.36 for Iceberg. The lower RMSE reflects smaller price variation in the Romaine market rather than better model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
+
+More importantly, the weather coefficients have consistent signs across the two varieties. Precipitation is positive and significant for both Iceberg and Romaine, and freeze risk is positive in both. The core findings of this paper, that weather affects prices through supply disruptions and that these effects are masked by price persistence, are not specific to Iceberg lettuce. They reflect the structure of the lettuce market as a whole.
+
+% ------------------------------------------------------------
+\subsection{Expanding vs.\ Rolling Window}
+\label{subsec:window}
+% ------------------------------------------------------------
+
+The expanding window produces slightly lower average RMSE than a five-year rolling window (\$4.36 vs.\ \$4.57 for OLS level). The two approaches give nearly identical results in early test years, when they share the same training set. The gap widens in later years, where the expanding window benefits from a larger training sample. This suggests that the data-generating process is sufficiently stable over our sample period that older observations remain informative. We use the expanding window for all reported results.
+
+% ------------------------------------------------------------
+\subsection{Coverage and Prediction Error}
+\label{subsec:coverage_error}
+% ------------------------------------------------------------
+
+Weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, meaning that fewer than half of shipments have an observed price, the average prediction error is \$4.98. For weeks with coverage above 0.95, the average error drops to \$2.83. This pattern is expected: when fewer districts report prices, the shipment-weighted average is noisier, and the model has less reliable training signal for those observations. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
+
+% ------------------------------------------------------------
+\subsection{The 2022 Extreme Year}
+\label{subsec:extreme_2022}
+% ------------------------------------------------------------
+
+The 2022 crop year was an outlier by any measure. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley that severely disrupted production.
+
+All models struggle with 2022, but the magnitude of failure varies. OLS achieves an RMSE of \$7.77 for the year, roughly double its average across other years. XGBoost reaches \$24.37 and Random Forest \$23.83. The disparity highlights the extrapolation problem: tree-based models cannot predict values outside the range of their training data, while OLS can at least follow the linear trend upward through the autoregressive component.
+
+We do not treat 2022 as a problem to be solved. Extreme phytosanitary events are inherently difficult to forecast from weather and market data alone. The relevant finding is that the model degrades gracefully under extreme conditions rather than producing nonsensical output. The OLS predictions track the direction of the spike even when they miss the magnitude.
+
+% ------------------------------------------------------------
+\subsection{Feature Stability}
+\label{subsec:stability}
+% ------------------------------------------------------------
+
+We split the sample into three sub-periods (2010--2015, 2016--2020, 2021--2026) and re-estimate the market-level OLS model on each. The coefficient on lagged price is stable: 1.22, 1.15, and 1.52 across the three periods. The precipitation coefficient is also consistent: 0.12, 0.12, and 0.18. There is no evidence of a structural break in the core relationships over the sample period.
+
+% ------------------------------------------------------------
+\subsection{Missing Price Prediction}
+\label{subsec:missing_price}
+% ------------------------------------------------------------
+
+Not all district-week observations have reported prices. Out of 2,441 district-week observations with positive shipment volume, 682 (28\%) are missing a price. These missing observations are concentrated in smaller districts: Oxnard (238 missing), Santa Maria (199), and Western Arizona (76).
+
+We train a model on observed prices using weather, volume, district indicators, and seasonal controls, then predict prices for the missing observations. OLS achieves an average out-of-sample RMSE of \$11.08 on the observed data (using expanding-window validation), compared to \$13.27 for XGBoost.
+
+The predicted prices for missing observations are systematically higher than the observed means for the same districts. For example, the predicted mean price for Oxnard's missing weeks is \$17.72, compared to an observed mean of \$15.30. This pattern is consistent with a selection effect in price reporting: districts may be less likely to report prices during periods of high prices or supply stress, when market conditions are more volatile and reporting may be disrupted.
 
 % ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
 
-TODO
+This paper builds a weekly data pipeline integrating USDA shipment data, FOB prices, and PRISM weather data to study how weather shocks affect supply and prices in U.S.\ lettuce markets. Three findings emerge.
+
+First, simple linear models outperform tree-based machine learning methods for price prediction. OLS achieves an out-of-sample RMSE of \$4.36, beating both XGBoost (\$6.67) and Random Forest (\$6.81). The market dynamics of lettuce pricing are dominated by a strong autoregressive component, and the underlying weather-price relationship is approximately linear. Nonlinear methods offer no advantage and are fragile during extreme events.
+
+Second, weather effects on prices are real but masked by price persistence. In level models, lagged price accounts for nearly half of total feature importance, leaving little room for weather variables to contribute. When we model price changes instead of price levels, weather variables become substantially more important. At the district level, freeze risk increases weekly prices by \$2.33 ($p < 0.001$), an effect that is diluted to insignificance when aggregated to the market level. The dual-layer modeling approach, combining market-level aggregation for prediction with district-level panels for identification, is necessary to uncover this pattern.
+
+Third, these findings are robust. All core results replicate when using Romaine lettuce instead of Iceberg. The model coefficients are stable across sub-periods of the sample. Diagnostics confirm that the expanding-window validation is appropriate and that data quality (measured by coverage ratio) is a meaningful predictor of model performance.
+
+Several limitations deserve mention. Our identification relies on the assumption that short-run weather variation affects supply but not demand. While this is plausible for weekly fluctuations, longer-run climate trends could affect both sides of the market. The 2022 virus outbreak illustrates that supply shocks outside the scope of weather data can dominate market outcomes, and no model based on weather and historical prices can anticipate such events. Finally, our sample covers only six production districts in California and Arizona. Extending the framework to other crops or regions would require new data collection and may reveal different market structures.
+
+Despite these limitations, the approach demonstrates that downstream market outcomes, shipment volumes and FOB prices, can serve as useful indicators of climate-driven supply risk even in the absence of high-frequency yield data. For buyers, distributors, and supply chain managers in fresh produce markets, the combination of publicly available USDA data and simple linear models provides a practical foundation for monitoring weather-related price risk.
 
 % ============================================================
 % References
