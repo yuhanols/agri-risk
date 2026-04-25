@@ -11,6 +11,7 @@
 \usepackage{setspace}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{url}
 
 \doublespacing
 
@@ -50,7 +51,7 @@ Second, weather effects on prices are real but hidden by price persistence. In l
 
 Third, all results are robust across lettuce varieties. Replicating the analysis with Romaine lettuce produces consistent coefficient signs and comparable, in fact lower, prediction errors (RMSE of \$2.61 vs.\ \$4.36 for Iceberg).
 
-This paper contributes to several literatures. Within agricultural economics, it demonstrates that downstream market outcomes, shipment volumes and wholesale prices, can identify weather-driven supply responses even in the absence of production or yield data. This approach may be applicable to other perishable crops where high-frequency yield data are unavailable. The finding that simple linear models dominate tree-based methods contributes to the growing applied econometrics literature on when machine learning improves on traditional methods, and when it does not. Finally, the dual-layer design, combining aggregation for prediction with disaggregation for identification, offers a practical template for settings where data coverage and causal identification require different levels of spatial aggregation.
+This paper contributes to several literatures. A large body of work in agricultural economics has studied how weather and climate affect crop yields, predominantly for staple grains \citep{schlenker2009nonlinear, roberts2013identifying}. More recent work has examined how weather shocks transmit to food prices through trader expectations \citep{letta2022weather}. Our contribution is to show that downstream market outcomes, shipment volumes and wholesale prices, can identify weather-driven supply responses even for perishable crops where high-frequency yield data are unavailable. The finding that simple linear models dominate tree-based methods contributes to the growing applied econometrics literature on when machine learning improves on traditional methods, and when it does not \citep{mullainathan2017machine}. Finally, the dual-layer design, combining aggregation for prediction with disaggregation for identification, offers a practical template for settings where data coverage and causal identification require different levels of spatial aggregation.
 
 The rest of the paper is organized as follows. Section~\ref{sec:background} describes the institutional structure of the U.S.\ lettuce market. Section~\ref{sec:data} presents the data sources and variable construction. Section~\ref{sec:methods} lays out the empirical strategy. Section~\ref{sec:results} reports the main results. Section~\ref{sec:mechanism} discusses the mechanism linking weather, supply, and prices. Section~\ref{sec:robustness} presents robustness checks, and Section~\ref{sec:conclusion} concludes.
 
@@ -59,7 +60,7 @@ The rest of the paper is organized as follows. Section~\ref{sec:background} desc
 \label{sec:background}
 % ============================================================
 
-The United States produces roughly 3.5 million tons of lettuce annually, with California and Arizona accounting for over 95\% of domestic production. The market is organized around a seasonal geographic rotation between two primary production regions.
+The United States produces roughly 3.5 million tons of lettuce annually, with California and Arizona accounting for over 95\% of domestic production \citep{usda_nass_vegetables}. The market is organized around a seasonal geographic rotation between two primary production regions.
 
 \textbf{Salinas-Watsonville, California} is the dominant production district. Located in the Salinas Valley on the central California coast, it benefits from a mild maritime climate well suited to lettuce during the spring, summer, and fall months (roughly April through November, corresponding to weeks 15--50 of the year). Salinas accounts for the largest share of national shipments during its active season.
 
@@ -85,11 +86,11 @@ This production structure has an important implication for empirical research. H
 
 We combine three publicly available data sources covering January 2010 through April 2026.
 
-\textbf{Shipment volume.} Weekly truck shipment reports from the USDA Agricultural Marketing Service (AMS) record the volume of each commodity shipped by truck from each production district. These reports are the best available high-frequency measure of lettuce supply. Unlike grain crops, where county-level yield data are published annually, lettuce is harvested continuously within each growing season, and no comparable high-frequency production data exist. Shipment volume serves as a proxy for production: because lettuce is highly perishable and cannot be stored for more than a few days, nearly all production is shipped within the week it is harvested.
+\textbf{Shipment volume.} Weekly truck shipment reports from the USDA Agricultural Marketing Service \citep{usda_ams_truck} record the volume of each commodity shipped by truck from each production district. These reports are the best available high-frequency measure of lettuce supply. Unlike grain crops, where county-level yield data are published annually, lettuce is harvested continuously within each growing season, and no comparable high-frequency production data exist. Shipment volume serves as a proxy for production: because lettuce is highly perishable and cannot be stored for more than a few days, nearly all production is shipped within the week it is harvested.
 
-\textbf{Prices.} Daily FOB (free on board) shipping point prices from USDA Market News report the price at which lettuce is sold at the point of origin, before transportation costs. We use FOB prices rather than retail prices because they more directly reflect supply conditions at the production level. FOB prices are reported by district, commodity, and package type. We aggregate daily prices to weekly averages.
+\textbf{Prices.} Daily FOB (free on board) shipping point prices from USDA Market News \citep{usda_market_news} report the price at which lettuce is sold at the point of origin, before transportation costs. We use FOB prices rather than retail prices because they more directly reflect supply conditions at the production level. FOB prices are reported by district, commodity, and package type. We aggregate daily prices to weekly averages.
 
-\textbf{Weather.} Daily temperature and precipitation data come from the PRISM Climate Group at Oregon State University, which produces gridded climate data at 4km resolution for the contiguous United States. For each production district, we extract daily maximum temperature, minimum temperature, and precipitation at the district centroid and aggregate to weekly summaries.
+\textbf{Weather.} Daily temperature and precipitation data come from the PRISM Climate Group at Oregon State University \citep{daly2008prism}, which produces gridded climate data at 4km resolution for the contiguous United States. For each production district, we extract daily maximum temperature, minimum temperature, and precipitation at the district centroid and aggregate to weekly summaries.
 
 % ------------------------------------------------------------
 \subsection{Production Districts}
@@ -181,7 +182,7 @@ P_t = \alpha + \boldsymbol{\beta}_1' \mathbf{W}_t + \boldsymbol{\beta}_2' \mathb
 \end{equation}
 where $P_t$ is the shipment-weighted iceberg lettuce FOB price in week $t$, $\mathbf{W}_t$ is a vector of contemporaneous weather variables, $\mathbf{L}_t$ contains lagged price and volume terms, $\mathbf{S}_t$ includes seasonal indicators (month and week of year), and $\mathbf{X}_t$ contains other controls such as coverage ratio and the number of active districts.
 
-We estimate Equation~\eqref{eq:market_level} by OLS with heteroskedasticity-robust standard errors (HC1). We also estimate the same specification using XGBoost and Random Forest as benchmarks for nonlinear alternatives.
+We estimate Equation~\eqref{eq:market_level} by OLS with heteroskedasticity-robust standard errors \citep{white1980heteroskedasticity}. We also estimate the same specification using XGBoost \citep{chen2016xgboost} and Random Forest \citep{breiman2001random} as benchmarks for nonlinear alternatives.
 
 The XGBoost model uses conservative hyperparameters to limit overfitting: 200 trees, maximum depth 3, learning rate 0.03, subsample ratio 0.7, and L1/L2 regularization ($\alpha = 1.0$, $\lambda = 5.0$). The Random Forest uses 500 trees, maximum depth 6, and minimum leaf size 10. These are deliberately restrictive settings, since the goal is not to maximize in-sample fit but to evaluate whether nonlinear methods can improve on OLS out of sample.
 
@@ -454,7 +455,7 @@ Despite these limitations, the approach demonstrates that downstream market outc
 % ============================================================
 % References
 % ============================================================
-\bibliographystyle{aer}
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}
