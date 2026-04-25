@@ -388,52 +388,182 @@ Taken together, the evidence supports the following mechanism. Weather shocks, p
 \label{subsec:romaine}
 % ------------------------------------------------------------
 
-We replicate the core analysis using Romaine lettuce prices instead of Iceberg. The market-level OLS model achieves an out-of-sample RMSE of \$2.61, compared to \$4.36 for Iceberg. The lower RMSE reflects smaller price variation in the Romaine market rather than better model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
+We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects smaller price variation in the Romaine market rather than better model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
 
-More importantly, the weather coefficients have consistent signs across the two varieties. Precipitation is positive and significant for both Iceberg and Romaine, and freeze risk is positive in both. The core findings of this paper, that weather affects prices through supply disruptions and that these effects are masked by price persistence, are not specific to Iceberg lettuce. They reflect the structure of the lettuce market as a whole.
+\begin{table}[H]
+\centering
+\caption{Romaine vs.\ Iceberg: model performance and weather coefficients}
+\label{tab:romaine}
+\begin{tabular}{lrr}
+\toprule
+ & Iceberg & Romaine \\
+\midrule
+\textit{Model performance} \\
+\quad In-sample $R^2$ (level) & 0.891 & 0.952 \\
+\quad In-sample RMSE & \$3.97 & \$2.48 \\
+\quad OOS avg RMSE & \$4.36 & \$2.61 \\
+\quad Price mean & \$16.27 & \$17.80 \\
+\quad Price coverage & 98.2\% & 98.4\% \\
+\addlinespace
+\textit{Weather coefficients ($\Delta P$ model)} \\
+\quad ppt\_total & 0.192$^{***}$ & 0.137$^{***}$ \\
+\quad freeze\_risk & 1.176 & 1.843$^{**}$ \\
+\quad heavy\_rain & $-$2.003$^{**}$ & $-$1.647$^{***}$ \\
+\quad price\_lag1 & 1.369$^{***}$ & 1.633$^{***}$ \\
+\bottomrule
+\multicolumn{3}{l}{\footnotesize $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.} \\
+\end{tabular}
+\end{table}
+
+More importantly, the weather coefficients have consistent signs across the two varieties. Precipitation is positive and significant for both ($p < 0.01$), freeze risk is positive in both (and significant for Romaine), and heavy rain is negative and significant in both. The core findings of this paper, that weather affects prices through supply disruptions and that these effects are masked by price persistence, are not specific to Iceberg lettuce. They reflect the structure of the lettuce market as a whole.
 
 % ------------------------------------------------------------
 \subsection{Expanding vs.\ Rolling Window}
 \label{subsec:window}
 % ------------------------------------------------------------
 
-The expanding window produces slightly lower average RMSE than a five-year rolling window (\$4.36 vs.\ \$4.57 for OLS level). The two approaches give nearly identical results in early test years, when they share the same training set. The gap widens in later years, where the expanding window benefits from a larger training sample. This suggests that the data-generating process is sufficiently stable over our sample period that older observations remain informative. We use the expanding window for all reported results.
+Table~\ref{tab:window} compares expanding-window and five-year rolling-window validation. The expanding window produces a lower average RMSE (\$4.36 vs.\ \$4.57). The two approaches give nearly identical results in early test years, when they share the same training set. The gap widens in later years: in 2021, the expanding window achieves \$3.41 vs.\ \$4.61 for rolling, and in 2022 the gap is \$7.77 vs.\ \$9.22. The expanding window benefits from a larger training sample, and the data-generating process is sufficiently stable that older observations remain informative.
+
+\begin{table}[H]
+\centering
+\caption{Expanding vs.\ rolling window: year-by-year RMSE (\$)}
+\label{tab:window}
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Expanding} & \multicolumn{2}{c}{Rolling (5yr)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+Year & RMSE & MAE & RMSE & MAE \\
+\midrule
+2014 & 2.47 & 1.86 & 2.47 & 1.86 \\
+2015 & 3.60 & 2.83 & 3.60 & 2.83 \\
+2016 & 2.66 & 1.84 & 2.71 & 1.85 \\
+2017 & 4.92 & 3.40 & 5.00 & 3.48 \\
+2018 & 5.12 & 2.94 & 5.00 & 2.88 \\
+2019 & 4.61 & 3.71 & 4.69 & 3.78 \\
+2020 & 4.17 & 2.95 & 4.27 & 2.97 \\
+2021 & 3.41 & 2.71 & 4.61 & 3.92 \\
+2022 & 7.77 & 4.93 & 9.22 & 5.81 \\
+2023 & 4.62 & 3.16 & 4.67 & 3.15 \\
+2024 & 4.56 & 3.53 & 4.71 & 3.54 \\
+2025 & 4.16 & 2.97 & 4.12 & 2.88 \\
+2026 & 4.59 & 4.04 & 4.28 & 3.77 \\
+\midrule
+\textbf{Average} & \textbf{4.36} & \textbf{3.14} & \textbf{4.57} & \textbf{3.29} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ------------------------------------------------------------
 \subsection{Coverage and Prediction Error}
 \label{subsec:coverage_error}
 % ------------------------------------------------------------
 
-Weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, meaning that fewer than half of shipments have an observed price, the average prediction error is \$4.98. For weeks with coverage above 0.95, the average error drops to \$2.83. This pattern is expected: when fewer districts report prices, the shipment-weighted average is noisier, and the model has less reliable training signal for those observations. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
+Table~\ref{tab:coverage} shows that weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, the average MAE is \$4.98, nearly double the \$2.83 for weeks with coverage above 0.95. This pattern is expected: when fewer districts report prices, the shipment-weighted average is noisier, and the model has less reliable training signal. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
+
+\begin{table}[H]
+\centering
+\caption{Prediction error by coverage ratio}
+\label{tab:coverage}
+\begin{tabular}{lrrrr}
+\toprule
+Coverage bin & $N$ & MAE (\$) & Median error (\$) & MAPE (\%) \\
+\midrule
+Very low ($< 0.5$) & 17 & 4.98 & 4.43 & 29.6 \\
+Low (0.5--0.7) & 1 & 3.97 & 3.97 & 16.8 \\
+Medium (0.7--0.85) & 69 & 3.55 & 2.56 & 18.2 \\
+High (0.85--0.95) & 69 & 3.99 & 2.87 & 19.5 \\
+Very high ($> 0.95$) & 480 & 2.83 & 1.84 & 18.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ------------------------------------------------------------
 \subsection{The 2022 Extreme Year}
 \label{subsec:extreme_2022}
 % ------------------------------------------------------------
 
-The 2022 crop year was an outlier by any measure. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley that severely disrupted production.
+The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} summarizes the key statistics. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley that severely disrupted production.
 
-All models struggle with 2022, but the magnitude of failure varies. OLS achieves an RMSE of \$7.77 for the year, roughly double its average across other years. XGBoost reaches \$24.37 and Random Forest \$23.83. The disparity highlights the extrapolation problem: tree-based models cannot predict values outside the range of their training data, while OLS can at least follow the linear trend upward through the autoregressive component.
+\begin{table}[H]
+\centering
+\caption{2022 extreme year: model performance comparison}
+\label{tab:extreme2022}
+\begin{tabular}{lrr}
+\toprule
+ & 2022 & Other years \\
+\midrule
+\textit{Price statistics} \\
+\quad Mean price & \$31.89 & $\sim$\$15 \\
+\quad Max price & \$94.33 & $\sim$\$50 \\
+\quad Price std & \$27.09 & $\sim$\$5 \\
+\addlinespace
+\textit{Model RMSE} \\
+\quad OLS Level & \$7.77 & \$3.95 \\
+\quad XGBoost Level & \$24.37 & \$4.75 \\
+\quad Random Forest Level & \$23.83 & \$4.89 \\
+\addlinespace
+\textit{Prediction error} \\
+\quad MAE (OLS) & \$4.93 & \$2.93 \\
+\quad Max error (OLS) & \$20.99 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-We do not treat 2022 as a problem to be solved. Extreme phytosanitary events are inherently difficult to forecast from weather and market data alone. The relevant finding is that the model degrades gracefully under extreme conditions rather than producing nonsensical output. The OLS predictions track the direction of the spike even when they miss the magnitude.
+The disparity between OLS and tree-based methods in 2022 highlights the extrapolation problem: tree-based models cannot predict values outside the range of their training data, while OLS can at least follow the linear trend upward through the autoregressive component. We do not treat 2022 as a problem to be solved. Extreme phytosanitary events are inherently difficult to forecast from weather and market data alone. The relevant finding is that OLS degrades gracefully under extreme conditions rather than producing nonsensical output.
 
 % ------------------------------------------------------------
 \subsection{Feature Stability}
 \label{subsec:stability}
 % ------------------------------------------------------------
 
-We split the sample into three sub-periods (2010--2015, 2016--2020, 2021--2026) and re-estimate the market-level OLS model on each. The coefficient on lagged price is stable: 1.22, 1.15, and 1.52 across the three periods. The precipitation coefficient is also consistent: 0.12, 0.12, and 0.18. There is no evidence of a structural break in the core relationships over the sample period.
+We split the sample into three sub-periods and re-estimate the market-level OLS model on each. Table~\ref{tab:stability} reports the key coefficients. The lagged price coefficient ranges from 1.15 to 1.52 across periods, and the precipitation coefficient from 0.12 to 0.18. There is no evidence of a structural break in the core relationships. The temperature variables ($tmax$, $tmin$) show sign instability, which reflects collinearity between them, not instability in the underlying weather-price relationship. Freeze risk flips sign between periods, consistent with its low frequency making it sensitive to specific events within each sub-sample.
+
+\begin{table}[H]
+\centering
+\caption{Coefficient stability across sub-periods (market-level OLS)}
+\label{tab:stability}
+\begin{tabular}{lrrr}
+\toprule
+Variable & 2010--2015 & 2016--2020 & 2021--2026 \\
+\midrule
+price\_lag1 & 1.218 & 1.153 & 1.517 \\
+ppt\_total & 0.116 & 0.118 & 0.181 \\
+freeze\_risk & 1.682 & $-$1.793 & $-$1.355 \\
+heavy\_rain & $-$2.190 & $-$0.670 & $-$2.181 \\
+extreme\_heat & $-$0.000 & $-$0.000 & $-$0.160 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ------------------------------------------------------------
 \subsection{Missing Price Prediction}
 \label{subsec:missing_price}
 % ------------------------------------------------------------
 
-Not all district-week observations have reported prices. Out of 2,441 district-week observations with positive shipment volume, 682 (28\%) are missing a price. These missing observations are concentrated in smaller districts: Oxnard (238 missing), Santa Maria (199), and Western Arizona (76).
+Not all district-week observations have reported prices. Out of 2,441 district-week observations with positive shipment volume, 682 (28\%) are missing a price. We train a model on observed prices using weather, volume, district indicators, and seasonal controls, then predict prices for the missing observations. OLS achieves an average out-of-sample RMSE of \$11.08 (expanding-window validation), compared to \$13.27 for XGBoost.
 
-We train a model on observed prices using weather, volume, district indicators, and seasonal controls, then predict prices for the missing observations. OLS achieves an average out-of-sample RMSE of \$11.08 on the observed data (using expanding-window validation), compared to \$13.27 for XGBoost.
+Table~\ref{tab:missing} compares predicted and observed mean prices by district. The predicted prices for missing observations are systematically higher than the observed means. For example, the predicted mean for Oxnard's missing weeks is \$17.72 vs.\ an observed mean of \$15.30. This pattern is consistent with a selection effect: districts may be less likely to report prices during periods of high prices or supply stress.
 
-The predicted prices for missing observations are systematically higher than the observed means for the same districts. For example, the predicted mean price for Oxnard's missing weeks is \$17.72, compared to an observed mean of \$15.30. This pattern is consistent with a selection effect in price reporting: districts may be less likely to report prices during periods of high prices or supply stress, when market conditions are more volatile and reporting may be disrupted.
+\begin{table}[H]
+\centering
+\caption{Missing price prediction by district}
+\label{tab:missing}
+\begin{tabular}{lrrr}
+\toprule
+District & Missing obs & Predicted mean (\$) & Observed mean (\$) \\
+\midrule
+Oxnard & 238 & 17.72 & 15.30 \\
+Santa Maria & 199 & 19.57 & 13.86 \\
+Western Arizona & 76 & 18.93 & 17.26 \\
+Imperial Valley & 71 & 20.93 & 15.49 \\
+Salinas-Watsonville & 49 & 23.72 & 16.14 \\
+San Joaquin Valley & 49 & 22.18 & 20.40 \\
+\midrule
+\textbf{Total} & \textbf{682} & --- & --- \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize OLS RMSE = \$11.08, XGBoost RMSE = \$13.27 (expanding window).} \\
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Conclusion}
