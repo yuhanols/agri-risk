@@ -47,7 +47,7 @@ Our empirical strategy combines market-level aggregation for prediction with dis
 
 First, simple linear models outperform tree-based machine learning methods across all prediction tasks, including price levels, price changes, and shipment volume. The best market-level price model achieves an out-of-sample RMSE of \$4.36, a 15\% improvement over a naive autoregressive baseline. XGBoost and Random Forest perform worse than the baseline in level models and offer no improvement in change models. This reflects a data-generating process dominated by strong price persistence and approximate linearity, under which additional model complexity does not improve predictive performance and reduces robustness in extreme periods.
 
-Second, weather effects on prices are present but obscured by price persistence in aggregate data. In level models, the one-week lagged price alone accounts for nearly half of total feature importance, leaving weather variables with little apparent explanatory power. When we model week-to-week price changes instead, removing the autoregressive component by construction, weather variables become substantially more important. At the district level, a frost event increases the local weekly price by \$2.33 ($p < 0.001$), while this effect is attenuated in market-level aggregates. The mechanism runs from weather to local supply disruption to local price increases, which then persist through the autoregressive structure of the market.
+Second, weather effects on prices are present but obscured by price persistence in aggregate data. In level models, the three price lags together account for nearly half of total feature importance, leaving weather variables with little apparent explanatory power. When we model week-to-week price changes instead, removing the autoregressive component by construction, weather variables become substantially more important. At the district level, a frost event increases the local weekly price by \$2.33 ($p < 0.001$), while this effect is attenuated in market-level aggregates. The mechanism runs from weather to local supply disruption to local price increases, which then persist through the autoregressive structure of the market.
 
 Third, all results are robust across lettuce varieties. Replicating the analysis with Romaine lettuce produces consistent coefficient signs and comparable, and in fact lower, prediction errors (RMSE of \$2.61 vs.\ \$4.36 for Iceberg).
 
@@ -265,11 +265,11 @@ Model performance is measured using root mean squared error (RMSE) in price leve
 \label{subsec:price_prediction}
 % ------------------------------------------------------------
 
-Table~\ref{tab:model_comparison} reports average out-of-sample RMSE for all models across the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.12. The OLS level model with full features achieves \$4.36, a 14.8\% improvement over the naive baseline. This is the best-performing model in our comparison.
+Table~\ref{tab:model_comparison} reports average out-of-sample prediction errors for the market-level price models over the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.12. The OLS level model with the full feature set achieves an RMSE of \$4.36, a 14.8\% improvement over the naive baseline and the best performance among the models considered.
 
 Both tree-based methods perform worse than OLS in level models. XGBoost averages \$6.67 and Random Forest \$6.81, each substantially worse than the naive baseline. This result is not an artifact of hyperparameter choice. The conservative settings we use are designed to prevent overfitting, and the models do learn meaningful patterns in-sample. The problem is that lettuce prices are driven primarily by a strong autoregressive component, and tree-based models handle this poorly out of sample.
 
-The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost exploded to \$24.37 and Random Forest to \$23.83. The reason is structural: tree-based methods cannot extrapolate beyond the range of training data. Having never seen prices above roughly \$40 in prior years, they could not predict a price of \$94. OLS, by contrast, extrapolates linearly through the lagged price coefficient, which at least moves predictions in the right direction during extreme episodes.
+The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost and Random Forest produced much larger errors, with RMSEs of \$24.37 and \$23.83, respectively. Because the training data contained no comparable price spike, the tree-based models substantially underpredicted the 2022 peak. This illustrates a limitation of tree-based methods in small-sample time series settings: they are generally poor at extrapolating beyond the range of the training data, while linear autoregressive models can extend trends through the lagged price coefficient.
 
 \begin{table}[H]
 \centering
@@ -279,7 +279,7 @@ The year-by-year results reveal the source of the gap most clearly in 2022. That
 \toprule
 Model & Avg RMSE (\$) & Avg MAE (\$) & vs.\ Naive \\
 \midrule
-Naive ($P_t = P_{t-1}$) & 5.12 & --- & baseline \\
+Naive ($P_t = P_{t-1}$) & 5.12 & 3.35 & baseline \\
 \addlinespace
 \textit{Level models} \\
 \quad OLS (full) & \textbf{4.36} & 3.14 & +14.8\% \\
@@ -311,17 +311,17 @@ Second, and more importantly, the relative importance of weather variables incre
 \label{subsec:volume}
 % ------------------------------------------------------------
 
-Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than naive but well behind OLS.
+Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms the nonlinear benchmark. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than naive but well behind OLS.
 
 Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
 
 \begin{table}[H]
 \centering
-\caption{Volume prediction: average RMSE (expanding window, 2014--2026)}
+\caption{Volume prediction: average RMSE in 10,000 lb units (expanding window, 2014--2026)}
 \label{tab:volume}
 \begin{tabular}{lrrr}
 \toprule
-Model & Avg RMSE & Avg MAE & vs.\ Naive \\
+Model & Avg RMSE (10k lbs) & Avg MAE (10k lbs) & vs.\ Naive \\
 \midrule
 Naive ($V_t = V_{t-1}$) & 463 & 347 & baseline \\
 OLS Level & \textbf{287} & 223 & +38.0\% \\
@@ -578,7 +578,7 @@ This paper builds a weekly data pipeline integrating USDA shipment data, FOB pri
 
 First, simple linear models outperform tree-based machine learning methods for price prediction. OLS achieves an out-of-sample RMSE of \$4.36, beating both XGBoost (\$6.67) and Random Forest (\$6.81). The market dynamics of lettuce pricing are dominated by a strong autoregressive component, and the underlying weather-price relationship is approximately linear. Nonlinear methods offer no advantage and are fragile during extreme events.
 
-Second, weather effects on prices are real but masked by price persistence. In level models, lagged price accounts for nearly half of total feature importance, leaving little room for weather variables to contribute. When we model price changes instead of price levels, weather variables become substantially more important. At the district level, freeze risk increases weekly prices by \$2.33 ($p < 0.001$), an effect that is diluted to insignificance when aggregated to the market level. The dual-layer modeling approach, combining market-level aggregation for prediction with district-level panels for identification, is necessary to uncover this pattern.
+Second, weather effects on prices are real but masked by price persistence. In level models, the three price lags together account for nearly half of total feature importance, leaving little room for weather variables to contribute. When we model price changes instead of price levels, weather variables become substantially more important. At the district level, freeze risk increases weekly prices by \$2.33 ($p < 0.001$), an effect that is diluted to insignificance when aggregated to the market level. The dual-layer modeling approach, combining market-level aggregation for prediction with district-level panels for identification, is necessary to uncover this pattern.
 
 Third, these findings are robust. All core results replicate when using Romaine lettuce instead of Iceberg. The model coefficients are stable across sub-periods of the sample. Diagnostics confirm that the expanding-window validation is appropriate and that data quality (measured by coverage ratio) is a meaningful predictor of model performance.
 
