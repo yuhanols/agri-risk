@@ -108,9 +108,11 @@ This uneven coverage has two implications. First, price data are missing non-ran
 \label{subsec:construction}
 % ------------------------------------------------------------
 
+Shipment volume is measured in units of 10,000 pounds, following USDA refrigerated truck movement reports.
+
 \textbf{Market-level price.} For each week, we construct a shipment-weighted average FOB price across all districts that report a price (Equation~\ref{eq:weighted_price}). Weighting by shipment volume ensures that districts with larger production have greater influence on the market price. To account for missing price observations, we define a coverage ratio (Equation~\ref{eq:coverage}) as the share of total weekly shipments for which a price is observed. The mean coverage ratio is 0.933, and 98.2\% of weeks have at least one district reporting a price. This construction yields a consistent weekly price series while explicitly tracking the reliability of the underlying price information.
 
-\textbf{Market-level weather.} Weather variables are aggregated to the market level using the same shipment weights. As a result, market-level weather reflects conditions in the districts that are actively supplying the market in a given week, rather than a fixed geographic average. When production shifts seasonally from Salinas to Yuma, the corresponding market-level weather measures shift accordingly.
+\textbf{Market-level weather.} Weather variables are aggregated to the market level using shipment weights. Market-level weather reflects conditions in the districts that are actively supplying the market in a given week, rather than a fixed geographic average. When production shifts seasonally from Salinas to Yuma, the market-level weather measures shift accordingly.
 
 \textbf{Extreme weather indicators.} Using the daily weather data, we construct three indicator variables for each district-week. The variable $freeze\_risk$ equals one if the minimum temperature falls below 0\textdegree C on any day within the week. The variable $extreme\_heat$ equals one if the maximum temperature exceeds 40\textdegree C on any day within the week. The variable $heavy\_rain$ equals one if total weekly precipitation exceeds 25 mm. At the market level, each indicator equals one if any active district experiences the event.
 
@@ -132,10 +134,10 @@ Variable & Mean & SD & Min & Max \\
 Price (\$/carton) & 16.27 & 11.80 & 5.99 & 94.33 \\
 Volume (10,000 lbs) & 4,422 & 749 & 2,313 & 6,993 \\
 Coverage ratio & 0.93 & 0.19 & 0.00 & 1.00 \\
-Tmax (\textdegree C) & 21.9 & 3.2 & 14.8 & 35.7 \\
-Tmin (\textdegree C) & 10.4 & 2.5 & 1.9 & 17.7 \\
+Tmax (\textdegree C) & 21.90 & 3.20 & 14.80 & 35.70 \\
+Tmin (\textdegree C) & 10.40 & 2.50 & 1.90 & 17.70 \\
 Precipitation (mm) & 1.95 & 5.93 & 0.00 & 80.52 \\
-Active districts & 2.9 & 1.1 & 2 & 6 \\
+Active districts & 2.90 & 1.10 & 2.00 & 6.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
