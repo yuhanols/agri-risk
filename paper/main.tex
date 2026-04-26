@@ -99,7 +99,7 @@ We combine three publicly available data sources covering January 2010 through A
 
 The data cover six lettuce production districts in California and Arizona: Salinas-Watsonville, Western Arizona (Yuma), Imperial Valley, Santa Maria, Oxnard, and the San Joaquin Valley. Together, these districts account for the vast majority of U.S.\ lettuce production.
 
-District activity and reporting vary substantially over time. Salinas-Watsonville, the largest district, ships in 626 of the 849 sample weeks and reports prices in 82\% of those weeks. Western Arizona ships in 454 weeks, primarily during the winter months, with 77\% price coverage. The remaining districts have more limited and irregular reporting: Oxnard reports prices in only 1\% of its active weeks, Santa Maria in 65\%, and the San Joaquin Valley in 71\%.
+District activity and reporting vary substantially over time. Salinas-Watsonville, the largest district, ships in 560 of the 849 sample weeks and reports prices in 91\% of those weeks. Western Arizona ships in 429 weeks, primarily during the winter months, with 82\% price coverage. The remaining districts have more limited and irregular reporting: Oxnard reports prices in only 2\% of its active weeks, Santa Maria in 69\%, and the San Joaquin Valley in 76\%.
 
 This uneven coverage has two implications. First, price data are missing non-randomly across districts and time. Second, relying on any single district would substantially reduce the usable sample. These features motivate the dual-layer empirical strategy described in Section~\ref{subsec:dual_layer}, which combines market-level aggregation to maximize coverage with district-level variation for identification.
 
@@ -265,7 +265,7 @@ Model performance is measured using root mean squared error (RMSE) in price leve
 \label{subsec:price_prediction}
 % ------------------------------------------------------------
 
-Table~\ref{tab:model_comparison} reports average out-of-sample prediction errors for the market-level price models over the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.12. The OLS level model with the full feature set achieves an RMSE of \$4.36, a 14.8\% improvement over the naive baseline and the best performance among the models considered.
+Table~\ref{tab:model_comparison} reports average out-of-sample prediction errors for the market-level price models over the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.11. The OLS level model with the full feature set achieves an RMSE of \$4.36, a 14.7\% improvement over the naive baseline and the best performance among the models considered.
 
 Both tree-based methods perform worse than OLS in level models. XGBoost averages \$6.67 and Random Forest \$6.81, each substantially worse than the naive baseline. This pattern is not driven by hyperparameter choice. The conservative settings we use are designed to limit overfitting, and the models capture meaningful in-sample variation. Rather, lettuce prices are driven primarily by a strong autoregressive component, and tree-based models do not perform well in this setting out of sample.
 
@@ -279,18 +279,18 @@ The year-by-year results reveal the source of the gap most clearly in 2022. That
 \toprule
 Model & Avg RMSE (\$) & Avg MAE (\$) & Improvement vs.\ Naive \\
 \midrule
-Naive ($P_t = P_{t-1}$) & 5.12 & 3.35 & baseline \\
+Naive ($P_t = P_{t-1}$) & 5.11 & 3.35 & baseline \\
 \addlinespace
 \textit{Level models} \\
-\quad OLS (full) & \textbf{4.36} & 3.14 & +14.8\% \\
-\quad XGBoost & 6.67 & 4.26 & $-$30.4\% \\
-\quad Random Forest & 6.81 & 4.32 & $-$33.2\% \\
+\quad OLS (full) & \textbf{4.36} & 3.14 & +14.7\% \\
+\quad XGBoost & 6.67 & 4.26 & $-$30.5\% \\
+\quad Random Forest & 6.81 & 4.32 & $-$33.3\% \\
 \addlinespace
 \textit{Change models} \\
-\quad OLS $\Delta P$ & 5.07 & 3.57 & +0.9\% \\
-\quad XGBoost $\Delta P$ & 5.12 & 3.56 & +0.0\% \\
-\quad Random Forest $\Delta P$ & 5.00 & 3.40 & +2.3\% \\
-\quad OLS log $\Delta P$ & 5.00 & 3.41 & +2.4\% \\
+\quad OLS $\Delta P$ & 5.07 & 3.57 & +0.8\% \\
+\quad XGBoost $\Delta P$ & 5.12 & 3.56 & $-$0.2\% \\
+\quad Random Forest $\Delta P$ & 5.00 & 3.40 & +2.2\% \\
+\quad OLS log $\Delta P$ & 5.00 & 3.41 & +2.2\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -409,11 +409,11 @@ We replicate the core analysis using Romaine lettuce prices instead of Iceberg. 
 \quad Price mean & \$16.27 & \$17.80 \\
 \quad Price coverage & 98.2\% & 98.4\% \\
 \addlinespace
-\textit{Weather coefficients ($\Delta P$ model)} \\
-\quad ppt\_total & 0.192$^{***}$ & 0.137$^{***}$ \\
-\quad freeze\_risk & 1.176 & 1.843$^{**}$ \\
-\quad heavy\_rain & $-$2.003$^{**}$ & $-$1.647$^{***}$ \\
-\quad price\_lag1 & 1.369$^{***}$ & 1.633$^{***}$ \\
+\textit{Key coefficients} \\
+\quad price\_lag1 (level) & 1.369$^{***}$ & 1.633$^{***}$ \\
+\quad ppt\_total ($\Delta P$) & 0.192$^{***}$ & 0.137$^{***}$ \\
+\quad freeze\_risk ($\Delta P$) & 1.176 & 1.843$^{**}$ \\
+\quad heavy\_rain ($\Delta P$) & $-$2.003$^{**}$ & $-$1.647$^{***}$ \\
 \bottomrule
 \multicolumn{3}{l}{\footnotesize $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.} \\
 \end{tabular}
