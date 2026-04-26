@@ -108,34 +108,34 @@ This uneven coverage has two implications. First, price data are missing non-ran
 \label{subsec:construction}
 % ------------------------------------------------------------
 
-\textbf{Market-level price.} For each week, we compute a shipment-weighted average FOB price across all districts that report a price (Equation~\ref{eq:weighted_price}). Weighting by shipment volume ensures that districts with larger production have proportionally greater influence on the market price. The coverage ratio (Equation~\ref{eq:coverage}) measures the fraction of total weekly shipments for which we observe a price. The mean coverage ratio is 0.933, and 98.2\% of weeks have at least one district reporting a price.
+\textbf{Market-level price.} For each week, we construct a shipment-weighted average FOB price across all districts that report a price (Equation~\ref{eq:weighted_price}). Weighting by shipment volume ensures that districts with larger production have greater influence on the market price. To account for missing price observations, we define a coverage ratio (Equation~\ref{eq:coverage}) as the share of total weekly shipments for which a price is observed. The mean coverage ratio is 0.933, and 98.2\% of weeks have at least one district reporting a price. This construction yields a consistent weekly price series while explicitly tracking the reliability of the underlying price information.
 
-\textbf{Market-level weather.} Weather variables are aggregated to the market level using the same shipment weights. This means that the market-level temperature in a given week reflects conditions in whichever districts are actively shipping, not a simple geographic average. When production shifts from Salinas to Yuma in the winter, the market-level weather automatically shifts to reflect Yuma conditions.
+\textbf{Market-level weather.} Weather variables are aggregated to the market level using the same shipment weights. As a result, market-level weather reflects conditions in the districts that are actively supplying the market in a given week, rather than a fixed geographic average. When production shifts seasonally from Salinas to Yuma, the corresponding market-level weather measures shift accordingly.
 
-\textbf{Extreme weather indicators.} From the daily weather data, we construct three binary indicators for each district-week: $freeze\_risk$ (any day with minimum temperature below 32\textdegree F), $extreme\_heat$ (any day with maximum temperature above 100\textdegree F), and $heavy\_rain$ (weekly precipitation above 25mm). At the market level, these indicators equal one if any active district experiences the event.
+\textbf{Extreme weather indicators.} Using the daily weather data, we construct three indicator variables for each district-week. The variable $freeze\_risk$ equals one if the minimum temperature falls below 0\textdegree C on any day within the week. The variable $extreme\_heat$ equals one if the maximum temperature exceeds 40\textdegree C on any day within the week. The variable $heavy\_rain$ equals one if total weekly precipitation exceeds 25 mm. At the market level, each indicator equals one if any active district experiences the event.
 
 % ------------------------------------------------------------
 \subsection{Summary Statistics}
 \label{subsec:summary}
 % ------------------------------------------------------------
 
-Table~\ref{tab:summary} reports summary statistics for the market-level dataset. The mean weekly iceberg lettuce FOB price is \$16.27 with a standard deviation of \$11.80. The distribution is right-skewed: the median price is \$12.30, and the maximum is \$94.33 (reached during the 2022 INSV outbreak). Mean weekly shipment volume is 4,422 tons. Extreme weather events are infrequent at the market level: freeze risk occurs in 14 of 849 weeks (1.6\%), extreme heat in 6 weeks (0.7\%), and heavy rain in 68 weeks (8.0\%).
+Table~\ref{tab:summary} reports summary statistics for the market-level dataset. The mean weekly iceberg lettuce FOB price is \$16.27 per carton with a standard deviation of \$11.80. The distribution is right-skewed, with a median of \$12.30 and a maximum of \$94.33, reached during the 2022 INSV outbreak. Mean weekly shipment volume is 4,422 tons. Extreme weather events are relatively infrequent at the market level: freeze risk occurs in 14 of 849 weeks (1.6\%), extreme heat in 6 weeks (0.7\%), and heavy rain in 68 weeks (8.0\%).
 
 \begin{table}[H]
 \centering
-\caption{Summary statistics: Market-level dataset (849 weeks, 2010--2026)}
+\caption{Summary statistics: Market-level dataset (849 weekly observations, 2010--2026)}
 \label{tab:summary}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Variable & Mean & SD & Min & Median & Max \\
+Variable & Mean & SD & Min & Max \\
 \midrule
-Price (\$/unit) & 16.27 & 11.80 & 5.99 & 12.30 & 94.33 \\
-Volume (tons) & 4,422 & 749 & 2,313 & 4,411 & 6,993 \\
-Coverage ratio & 0.933 & --- & 0.000 & --- & 1.000 \\
-Tmax (\textdegree F) & 21.9 & 3.2 & --- & --- & --- \\
-Tmin (\textdegree F) & 10.4 & 2.5 & --- & --- & --- \\
-Precipitation (mm) & 1.95 & 5.93 & --- & --- & --- \\
-Active districts & 2.9 & --- & --- & --- & --- \\
+Price (\$/carton) & 16.27 & 11.80 & 5.99 & 94.33 \\
+Volume (tons) & 4,422 & 749 & 2,313 & 6,993 \\
+Coverage ratio & 0.93 & 0.19 & 0.00 & 1.00 \\
+Tmax (\textdegree C) & 21.9 & 3.2 & 14.8 & 35.7 \\
+Tmin (\textdegree C) & 10.4 & 2.5 & 1.9 & 17.7 \\
+Precipitation (mm) & 1.95 & 5.93 & 0.00 & 80.52 \\
+Active districts & 2.9 & 1.1 & 2 & 6 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -232,7 +232,7 @@ Comparing coefficients across the change and level specifications at the distric
 
 All models draw on the same set of engineered features, constructed from the three raw data sources.
 
-\textbf{Weather variables.} Contemporaneous weekly weather includes maximum and minimum temperature ($tmax$, $tmin$), total precipitation ($ppt$), and diurnal range ($tmax - tmin$). Three binary extreme-weather indicators capture tail events: $freeze\_risk$ equals one if the minimum daily temperature falls below 32\textdegree F during the week, $extreme\_heat$ equals one if the maximum daily temperature exceeds 100\textdegree F, and $heavy\_rain$ equals one if weekly precipitation exceeds 25mm.
+\textbf{Weather variables.} Contemporaneous weekly weather includes maximum and minimum temperature ($tmax$, $tmin$), total precipitation ($ppt$), and diurnal range ($tmax - tmin$). Three binary extreme-weather indicators capture tail events: $freeze\_risk$ equals one if the minimum daily temperature falls below 0\textdegree C during the week, $extreme\_heat$ equals one if the maximum daily temperature exceeds 40\textdegree C, and $heavy\_rain$ equals one if weekly precipitation exceeds 25mm.
 
 \textbf{Lagged variables.} For prices, shipment volume, temperature, and precipitation, we include lags at 1, 2, and 4 weeks. The 1-week lag captures short-run persistence, the 2-week lag reflects the approximate harvest cycle for lettuce, and the 4-week lag captures monthly patterns.
 
