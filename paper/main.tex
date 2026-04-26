@@ -300,7 +300,7 @@ Naive ($P_t = P_{t-1}$) & 5.11 & 3.35 & baseline \\
 \label{subsec:persistence}
 % ------------------------------------------------------------
 
-In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.89. The one-week lagged price alone accounts for 28\% of total feature importance in the XGBoost level model, and the three price lags together account for 47\%, indicating that price persistence dominates the predictive structure. Precipitation is statistically significant ($\hat{\beta} = 0.12$, $p = 0.01$), but its economic magnitude is small relative to the lagged price term.
+In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.891. The one-week lagged price alone accounts for 28\% of total feature importance in the XGBoost level model, and the three price lags together account for 47\%, indicating that price persistence dominates the predictive structure. Precipitation is statistically significant ($\hat{\beta} = 0.123$, $p = 0.010$), but its economic magnitude is small relative to the lagged price term.
 
 The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, the three estimation methods converge: OLS, XGBoost, and Random Forest all produce average RMSEs within a narrow range of \$5.00 to \$5.13. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
 
@@ -392,7 +392,7 @@ Taken together, the evidence supports the following mechanism. Weather shocks, p
 \label{subsec:romaine}
 % ------------------------------------------------------------
 
-We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects lower price volatility rather than improved model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
+We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects lower price volatility rather than improved model fit; the in-sample $R^2$ is actually higher for Romaine (0.952 vs.\ 0.891).
 
 \begin{table}[H]
 \centering
@@ -508,9 +508,8 @@ The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} su
 \quad XGBoost Level & \$24.37 & \$4.75 \\
 \quad Random Forest Level & \$23.83 & \$4.89 \\
 \addlinespace
-\textit{Prediction error} \\
-\quad MAE (OLS) & \$4.93 & \$2.93 \\
-\quad Max error (OLS) & \$20.99 & --- \\
+\textit{Prediction error (OLS)} \\
+\quad MAE & \$4.93 & \$2.93 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -522,7 +521,7 @@ The disparity between OLS and tree-based methods in 2022 highlights an extrapola
 \label{subsec:stability}
 % ------------------------------------------------------------
 
-We split the sample into three sub-periods and re-estimate the market-level OLS model on each. Table~\ref{tab:stability} reports the key coefficients. The lagged price coefficient ranges from 1.15 to 1.52 across periods, and the precipitation coefficient from 0.12 to 0.18. There is no clear evidence of a structural break in the core relationships.
+We split the sample into three sub-periods and re-estimate the market-level OLS model on each. Table~\ref{tab:stability} reports the key coefficients. The lagged price coefficient ranges from 1.153 to 1.517 across periods, and the precipitation coefficient from 0.116 to 0.181. There is no clear evidence of a structural break in the core relationships.
 
 The temperature variables ($tmax$, $tmin$) show sign instability, which likely reflects collinearity between them rather than instability in the underlying relationship. Freeze risk also varies across periods, consistent with its low frequency making it sensitive to individual events within each sub-sample.
 
@@ -567,7 +566,7 @@ Imperial Valley & 71 & 20.93 & 15.49 \\
 Salinas-Watsonville & 49 & 23.72 & 16.14 \\
 San Joaquin Valley & 49 & 22.18 & 20.40 \\
 \midrule
-\textbf{Total} & \textbf{682} & --- & --- \\
+\textbf{Total} & \textbf{682} & & \\
 \bottomrule
 \multicolumn{4}{l}{\footnotesize OLS RMSE = \$11.08, XGBoost RMSE = \$13.27 (expanding window).} \\
 \end{tabular}
