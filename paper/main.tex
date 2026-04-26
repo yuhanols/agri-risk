@@ -346,7 +346,7 @@ The results in Section~\ref{sec:results} establish that weather matters for lett
 
 Table~\ref{tab:district_weather} reports weather coefficients from the district panel specifications described in Section~\ref{subsec:district_panel}. The change model (Equation~\ref{eq:district_change}) includes district fixed effects, quarter fixed effects, and district-by-season interactions. Standard errors are clustered at the district level.
 
-Freeze risk is the strongest and most robust weather predictor. In the change model, a week with at least one day below freezing is associated with a price increase of \$2.33 ($p < 0.001$). This estimate is stable across specifications: adding volume controls and lagged weather changes the coefficient only slightly, from \$2.33 to \$2.37 to \$2.24. Minimum temperature has a significant negative coefficient ($-\$0.15$ to $-\$0.17$ per degree Fahrenheit, $p < 0.01$), which is the continuous counterpart of the freeze risk indicator: colder weeks mean higher prices. Extreme heat is significant in the level specification (\$2.16, $p = 0.008$) but not in the change models, suggesting that heat effects operate over a slightly longer horizon than week-to-week changes can capture.
+Freeze risk is the strongest and most robust weather predictor. In the change model, a week with at least one day below freezing is associated with a price increase of \$2.33 ($p < 0.001$). This estimate is stable across specifications: adding volume controls and lagged weather changes the coefficient only slightly, from \$2.33 to \$2.37 to \$2.24. Minimum temperature has a significant negative coefficient ($-\$0.15$ to $-\$0.17$ per degree Celsius, $p < 0.01$), which is the continuous counterpart of the freeze risk indicator: colder weeks are associated with higher prices. Extreme heat is significant in the level specification (\$2.16, $p = 0.008$) but not in the change models, suggesting that heat effects operate over a slightly longer horizon than week-to-week changes can capture.
 
 \begin{table}[H]
 \centering
@@ -354,7 +354,7 @@ Freeze risk is the strongest and most robust weather predictor. In the change mo
 \label{tab:district_weather}
 \begin{tabular}{lrrrr}
 \toprule
-Variable & $\Delta P$ (M1) & $\Delta P$ + vol (M2) & + weather lags (M3) & Level (M4) \\
+Variable & $\Delta P_{it}$ (M1) & $\Delta P_{it}$ + vol (M2) & + weather lags (M3) & Level (M4) \\
 \midrule
 freeze\_risk & 2.326$^{***}$ & 2.368$^{***}$ & 2.237$^{***}$ & 1.354 \\
 tmin\_avg & $-$0.164$^{**}$ & $-$0.169$^{***}$ & $-$0.145$^{***}$ & $-$0.128$^{***}$ \\
@@ -367,7 +367,7 @@ heavy\_rain & $-$0.914 & $-$0.919 & $-$0.824 & $-$2.124 \\
 \end{tabular}
 \end{table}
 
-The precipitation coefficient is positive but not statistically significant in any specification. This is somewhat surprising given that precipitation significantly predicts both price at the market level and volume. One possible explanation is that precipitation effects on price operate primarily through volume reductions at the market level, and the district panel, which does not aggregate across districts, captures a noisier version of this channel.
+The precipitation coefficient is positive but not statistically significant in any specification. This result is somewhat unexpected given that precipitation significantly predicts both price at the market level and volume. A plausible explanation is that precipitation effects on price operate primarily through volume reductions at the market level, and the district panel, which does not aggregate across districts, captures a noisier version of this channel.
 
 % ------------------------------------------------------------
 \subsection{Why Level Models Mask Weather Effects}
@@ -378,9 +378,9 @@ The comparison across columns in Table~\ref{tab:district_weather} illustrates ho
 
 This attenuation is not a statistical artifact. It reflects a real feature of the price process. Weather shocks are transitory, but their price effects persist through the autoregressive structure of the market. A freeze in Yuma raises the Yuma price, which feeds into the market-level price, which then carries forward through price persistence. The level model captures the persistence but not the initial cause. The change model captures the cause but not the persistence. Both are needed to tell the full story.
 
-The district panel also reveals heterogeneity that is lost in the market aggregate. A freeze event in Western Arizona has a direct and immediate effect on the local price, but when averaged with Salinas (which may not experience a freeze in the same week), the signal is diluted. This is why freeze risk is highly significant ($p < 0.001$) in the district panel but not significant in the market-level regressions. The dual-layer design is not just a convenience for handling missing data; it is necessary for identifying localized weather effects that aggregation would obscure.
+The district panel also reveals heterogeneity that is lost in the market aggregate. A freeze event in Western Arizona has a direct and immediate effect on the local price, but when averaged with Salinas (which may not experience a freeze in the same week), the signal is diluted. This helps explain why freeze risk is highly significant ($p < 0.001$) in the district panel but not significant in the market-level regressions. The dual-layer design is not just a convenience for handling missing data; it is necessary for identifying localized weather effects that aggregation would obscure.
 
-Taken together, the evidence supports the following mechanism. Weather shocks, particularly freezes and heat waves, reduce local supply in the affected district. The supply reduction raises the local FOB price. Because the market is spatially connected (buyers can substitute across districts to some extent), the price increase propagates to the market level. Once embedded in the market price, the shock persists through the autoregressive price process. The chain runs: weather $\to$ local supply $\to$ local price $\to$ market price $\to$ persistence.
+Taken together, the evidence supports the following mechanism. Weather shocks, particularly freezes and heat waves, reduce local supply in the affected district. The supply reduction raises the local FOB price. Because the market is spatially connected (buyers can substitute across districts to some extent), the price increase propagates to the market level. Once embedded in the market price, the shock persists through the autoregressive price process. The chain runs: weather $\to$ local supply $\to$ local price $\to$ market price $\to$ persistence. This mechanism reconciles the apparent disconnect between weak weather effects in aggregate regressions and strong effects in the panel estimates.
 
 % ============================================================
 \section{Robustness}
