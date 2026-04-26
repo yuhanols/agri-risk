@@ -392,7 +392,7 @@ Taken together, the evidence supports the following mechanism. Weather shocks, p
 \label{subsec:romaine}
 % ------------------------------------------------------------
 
-We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects smaller price variation in the Romaine market rather than better model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
+We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects lower price volatility rather than improved model fit; the in-sample $R^2$ is actually higher for Romaine (0.95 vs.\ 0.89).
 
 \begin{table}[H]
 \centering
@@ -419,14 +419,14 @@ We replicate the core analysis using Romaine lettuce prices instead of Iceberg. 
 \end{tabular}
 \end{table}
 
-More importantly, the weather coefficients have consistent signs across the two varieties. Precipitation is positive and significant for both ($p < 0.01$), freeze risk is positive in both (and significant for Romaine), and heavy rain is negative and significant in both. The core findings of this paper, that weather affects prices through supply disruptions and that these effects are masked by price persistence, are not specific to Iceberg lettuce. They reflect the structure of the lettuce market as a whole.
+More importantly, the weather coefficients have consistent signs across the two varieties. Precipitation is positive and significant for both ($p < 0.01$), freeze risk is positive in both (and significant for Romaine), and heavy rain is negative and significant in both. The core findings of this paper, that weather affects prices through supply disruptions and that these effects are masked by price persistence, are not specific to Iceberg lettuce. They reflect the structure of the lettuce market more broadly.
 
 % ------------------------------------------------------------
 \subsection{Expanding vs.\ Rolling Window}
 \label{subsec:window}
 % ------------------------------------------------------------
 
-Table~\ref{tab:window} compares expanding-window and five-year rolling-window validation. The expanding window produces a lower average RMSE (\$4.36 vs.\ \$4.57). The two approaches give nearly identical results in early test years, when they share the same training set. The gap widens in later years: in 2021, the expanding window achieves \$3.41 vs.\ \$4.61 for rolling, and in 2022 the gap is \$7.77 vs.\ \$9.22. The expanding window benefits from a larger training sample, and the data-generating process is sufficiently stable that older observations remain informative.
+Table~\ref{tab:window} compares expanding-window and five-year rolling-window validation. The expanding window produces a lower average RMSE (\$4.36 vs.\ \$4.57). The two approaches yield nearly identical results in early test years, when they share the same training set. The gap widens in later years: in 2021, the expanding window achieves \$3.41 vs.\ \$4.61 for rolling, and in 2022 the gap is \$7.77 vs.\ \$9.22. The expanding window benefits from a larger training sample, and the data-generating process appears sufficiently stable that older observations remain informative.
 
 \begin{table}[H]
 \centering
@@ -463,6 +463,8 @@ Year & RMSE & MAE & RMSE & MAE \\
 % ------------------------------------------------------------
 
 Table~\ref{tab:coverage} shows that weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, the average MAE is \$4.98, nearly double the \$2.83 for weeks with coverage above 0.95. This pattern is expected: when fewer districts report prices, the shipment-weighted average is noisier, and the model has less reliable training signal. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
+
+The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution.
 
 \begin{table}[H]
 \centering
@@ -513,14 +515,16 @@ The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} su
 \end{tabular}
 \end{table}
 
-The disparity between OLS and tree-based methods in 2022 highlights the extrapolation problem: tree-based models cannot predict values outside the range of their training data, while OLS can at least follow the linear trend upward through the autoregressive component. We do not treat 2022 as a problem to be solved. Extreme phytosanitary events are inherently difficult to forecast from weather and market data alone. The relevant finding is that OLS degrades gracefully under extreme conditions rather than producing nonsensical output.
+The disparity between OLS and tree-based methods in 2022 highlights an extrapolation issue: tree-based models are generally unable to extrapolate beyond the range of their training data, while OLS can follow the upward movement through the autoregressive component. We do not interpret 2022 as a failure of the model. Extreme phytosanitary shocks are inherently difficult to forecast using weather and market data alone. The relevant finding is that OLS degrades more gracefully under extreme conditions, rather than producing highly unstable predictions.
 
 % ------------------------------------------------------------
 \subsection{Feature Stability}
 \label{subsec:stability}
 % ------------------------------------------------------------
 
-We split the sample into three sub-periods and re-estimate the market-level OLS model on each. Table~\ref{tab:stability} reports the key coefficients. The lagged price coefficient ranges from 1.15 to 1.52 across periods, and the precipitation coefficient from 0.12 to 0.18. There is no evidence of a structural break in the core relationships. The temperature variables ($tmax$, $tmin$) show sign instability, which reflects collinearity between them, not instability in the underlying weather-price relationship. Freeze risk flips sign between periods, consistent with its low frequency making it sensitive to specific events within each sub-sample.
+We split the sample into three sub-periods and re-estimate the market-level OLS model on each. Table~\ref{tab:stability} reports the key coefficients. The lagged price coefficient ranges from 1.15 to 1.52 across periods, and the precipitation coefficient from 0.12 to 0.18. There is no clear evidence of a structural break in the core relationships.
+
+The temperature variables ($tmax$, $tmin$) show sign instability, which likely reflects collinearity between them rather than instability in the underlying relationship. Freeze risk also varies across periods, consistent with its low frequency making it sensitive to individual events within each sub-sample.
 
 \begin{table}[H]
 \centering
@@ -546,7 +550,7 @@ extreme\_heat & $-$0.000 & $-$0.000 & $-$0.160 \\
 
 Not all district-week observations have reported prices. Out of 2,441 district-week observations with positive shipment volume, 682 (28\%) are missing a price. We train a model on observed prices using weather, volume, district indicators, and seasonal controls, then predict prices for the missing observations. OLS achieves an average out-of-sample RMSE of \$11.08 (expanding-window validation), compared to \$13.27 for XGBoost.
 
-Table~\ref{tab:missing} compares predicted and observed mean prices by district. The predicted prices for missing observations are systematically higher than the observed means. For example, the predicted mean for Oxnard's missing weeks is \$17.72 vs.\ an observed mean of \$15.30. This pattern is consistent with a selection effect: districts may be less likely to report prices during periods of high prices or supply stress.
+Table~\ref{tab:missing} compares predicted and observed mean prices by district. The predicted prices for missing observations are systematically higher than the observed means. For example, the predicted mean for Oxnard's missing weeks is \$17.72 vs.\ an observed mean of \$15.30. This pattern is consistent with non-random missingness in price reporting: districts may be less likely to report prices during periods of high prices or supply stress.
 
 \begin{table}[H]
 \centering
