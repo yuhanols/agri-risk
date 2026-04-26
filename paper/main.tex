@@ -267,17 +267,17 @@ Model performance is measured using root mean squared error (RMSE) in price leve
 
 Table~\ref{tab:model_comparison} reports average out-of-sample prediction errors for the market-level price models over the 2014--2026 test period. The naive baseline, which predicts $\hat{P}_t = P_{t-1}$, has an average RMSE of \$5.12. The OLS level model with the full feature set achieves an RMSE of \$4.36, a 14.8\% improvement over the naive baseline and the best performance among the models considered.
 
-Both tree-based methods perform worse than OLS in level models. XGBoost averages \$6.67 and Random Forest \$6.81, each substantially worse than the naive baseline. This result is not an artifact of hyperparameter choice. The conservative settings we use are designed to prevent overfitting, and the models do learn meaningful patterns in-sample. The problem is that lettuce prices are driven primarily by a strong autoregressive component, and tree-based models handle this poorly out of sample.
+Both tree-based methods perform worse than OLS in level models. XGBoost averages \$6.67 and Random Forest \$6.81, each substantially worse than the naive baseline. This pattern is not driven by hyperparameter choice. The conservative settings we use are designed to limit overfitting, and the models capture meaningful in-sample variation. Rather, lettuce prices are driven primarily by a strong autoregressive component, and tree-based models do not perform well in this setting out of sample.
 
-The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost exploded to \$24.37 and Random Forest to \$23.83. The reason is structural: tree-based methods are generally poor at extrapolating beyond the range of training data. Having never seen prices above roughly \$50 in prior years, they could not predict a price of \$94. OLS, by contrast, extrapolates linearly through the lagged price coefficient, which at least moves predictions in the right direction during extreme episodes.
+The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost and Random Forest produced much larger errors, with RMSEs of \$24.37 and \$23.83, respectively. Because the training data contain no comparable price spike, the tree-based models substantially underpredict the 2022 peak. This illustrates a limitation of tree-based methods in small-sample time series settings: they are generally poor at extrapolating beyond the range of the training data, while linear autoregressive models can extend trends through the lagged price coefficient.
 
 \begin{table}[H]
 \centering
-\caption{Out-of-sample model comparison: average RMSE (2014--2026)}
+\caption{Out-of-sample model comparison: average RMSE and MAE (2014--2026, expanding window)}
 \label{tab:model_comparison}
 \begin{tabular}{lrrr}
 \toprule
-Model & Avg RMSE (\$) & Avg MAE (\$) & vs.\ Naive \\
+Model & Avg RMSE (\$) & Avg MAE (\$) & Improvement vs.\ Naive \\
 \midrule
 Naive ($P_t = P_{t-1}$) & 5.12 & 3.35 & baseline \\
 \addlinespace
@@ -300,28 +300,28 @@ Naive ($P_t = P_{t-1}$) & 5.12 & 3.35 & baseline \\
 \label{subsec:persistence}
 % ------------------------------------------------------------
 
-In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.89. This single variable accounts for most of the model's explanatory power. Precipitation is statistically significant ($\hat{\beta} = 0.12$, $p = 0.01$), but its economic magnitude is small relative to the lagged price term.
+In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.89. The one-week lagged price alone accounts for 28\% of total feature importance in the XGBoost level model, and the three price lags together account for 47\%, indicating that price persistence dominates the predictive structure. Precipitation is statistically significant ($\hat{\beta} = 0.12$, $p = 0.01$), but its economic magnitude is small relative to the lagged price term.
 
 The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, the three estimation methods converge: OLS, XGBoost, and Random Forest all produce average RMSEs within a narrow range of \$5.00 to \$5.13. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
 
-Second, and more importantly, the relative importance of weather variables increases substantially. In the XGBoost level model, the three price lags together account for 47\% of total feature importance. Temperature ($tmax$) contributes only 2.4\%. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) gain as well. The weather signal was there all along; it was simply overwhelmed by price persistence in the level specification.
+Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.4\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) increase as well. The weather signal was present in the data but was masked by price persistence in the level specification.
 
 % ------------------------------------------------------------
 \subsection{Volume Prediction}
 \label{subsec:volume}
 % ------------------------------------------------------------
 
-Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms the nonlinear benchmark. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than naive but well behind OLS.
+Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than the naive baseline but well behind OLS.
 
 Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
 
 \begin{table}[H]
 \centering
-\caption{Volume prediction: average RMSE in 10,000 lb units (expanding window, 2014--2026)}
+\caption{Volume prediction: average RMSE and MAE (10,000 lbs, expanding window, 2014--2026)}
 \label{tab:volume}
 \begin{tabular}{lrrr}
 \toprule
-Model & Avg RMSE (10k lbs) & Avg MAE (10k lbs) & vs.\ Naive \\
+Model & Avg RMSE (10,000 lbs) & Avg MAE (10,000 lbs) & Improvement vs.\ Naive \\
 \midrule
 Naive ($V_t = V_{t-1}$) & 463 & 347 & baseline \\
 OLS Level & \textbf{287} & 223 & +38.0\% \\
