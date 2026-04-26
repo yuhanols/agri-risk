@@ -309,7 +309,7 @@ Second, and more importantly, the relative importance of weather variables incre
 \label{subsec:volume}
 % ------------------------------------------------------------
 
-Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287 tons, a 38.0\% improvement over the naive baseline of 463 tons. XGBoost achieves 354 tons, better than naive but well behind OLS.
+Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than naive but well behind OLS.
 
 Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
 
