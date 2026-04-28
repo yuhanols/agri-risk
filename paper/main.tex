@@ -81,7 +81,14 @@ The U.S.\ lettuce market is highly geographically concentrated, with California 
 
 \textbf{Imperial Valley, California} serves as a supplementary desert production district, with a seasonal pattern similar to Yuma but smaller volumes. Three other California districts, Santa Maria, Oxnard, and the San Joaquin Valley, contribute smaller and more intermittent shipments.
 
-The annual rotation between California and Arizona is largely calendar-driven and follows a stable pattern over time. Production transitions occur around weeks 15--20 (as Salinas ramps up and Arizona winds down) and weeks 45--50 (as Salinas winds down and Arizona ramps up). These transition periods are associated with temporary supply contractions and elevated price volatility. They are also particularly sensitive to weather shocks, as supply is already constrained during the shift between regions.
+The annual rotation between California and Arizona is largely calendar-driven and follows a stable pattern over time. Production transitions occur around weeks 15--20 (as Salinas ramps up and Arizona winds down) and weeks 45--50 (as Salinas winds down and Arizona ramps up). These transition periods are associated with temporary supply contractions and elevated price volatility. They are also particularly sensitive to weather shocks, as supply is already constrained during the shift between regions. Figure~\ref{fig:seasonal_pattern} illustrates this seasonal rotation. Salinas dominates shipments from roughly weeks 15--50, while Western Arizona dominates the winter weeks. Price spikes are concentrated around the transition periods, when total supply is temporarily thinner.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_seasonal_pattern.pdf}
+\caption{Seasonal shipment and price patterns by production district. Panel (a) shows average weekly shipment volume and panel (b) shows average FOB price, both by week of year across the 2010--2026 sample. Gray bands indicate the spring (weeks 14--18) and fall (weeks 44--50) transition periods.}
+\label{fig:seasonal_pattern}
+\end{figure}
 
 Lettuce has a short growing cycle of approximately 60 to 90 days from planting to harvest. Unlike annual grain crops, production occurs on a continuous, rolling basis throughout the season, with fields replanted multiple times per year. As a result, there is no single harvest event that determines total output. Instead, supply in any given week reflects planting decisions made two to three months earlier, realized growing conditions, and the pace of harvest operations. This structure generates a natural lag between weather shocks and realized supply.
 
@@ -308,6 +315,15 @@ Naive ($P_t = P_{t-1}$) & 5.11 & 3.35 & baseline \\
 \end{tabular}
 \end{table}
 
+Figure~\ref{fig:actual_predicted} plots actual and predicted market-level prices from the OLS model. The model tracks normal years closely, while most large errors occur during the 2022 price spike driven by the INSV outbreak.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_actual_vs_predicted.pdf}
+\caption{Market-level iceberg lettuce price: actual vs.\ OLS predicted (out-of-sample, expanding window, 2014--2026). Panel (a) shows the price time series; the red band highlights 2022. Panel (b) shows prediction errors (actual minus predicted).}
+\label{fig:actual_predicted}
+\end{figure}
+
 % ------------------------------------------------------------
 \subsection{Price Persistence and Hidden Weather Effects}
 \label{subsec:persistence}
@@ -317,7 +333,14 @@ In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$
 
 The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, the three estimation methods converge: OLS, XGBoost, and Random Forest all produce average RMSEs within a narrow range of \$5.00 to \$5.13. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
 
-Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.4\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) increase as well. The weather signal was present in the data but was masked by price persistence in the level specification.
+Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.4\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) increase as well. The weather signal was present in the data but was masked by price persistence in the level specification. Figure~\ref{fig:feature_importance} visualizes this shift.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig3_feature_importance.pdf}
+\caption{XGBoost feature importance: price level vs.\ price change models. The level model is dominated by lagged prices, particularly Price~$(t\!-\!1)$. In the change model, where price lags are removed by construction, importance is redistributed toward weather, volume, and seasonal variables.}
+\label{fig:feature_importance}
+\end{figure}
 
 % ------------------------------------------------------------
 \subsection{Volume Prediction}
@@ -477,7 +500,14 @@ Year & RMSE & MAE & RMSE & MAE \\
 
 Table~\ref{tab:coverage} shows that weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, the average MAE is \$4.98, nearly double the \$2.83 for weeks with coverage above 0.95. This pattern is expected: when fewer districts report prices, the shipment-weighted average is noisier, and the model has less reliable training signal. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
 
-The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution.
+The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution. Figure~\ref{fig:coverage_error} shows the underlying scatter, confirming the monotonic relationship between coverage and prediction accuracy.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/fig4_coverage_vs_error.pdf}
+\caption{Price coverage ratio vs.\ absolute prediction error. Each point is one out-of-sample week. Red markers show bin averages with sample sizes. Prediction errors decline monotonically as coverage increases, consistent with measurement error in the shipment-weighted price.}
+\label{fig:coverage_error}
+\end{figure}
 
 \begin{table}[H]
 \centering
