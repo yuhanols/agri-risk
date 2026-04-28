@@ -271,7 +271,7 @@ All models use the same set of constructed features.
 
 Out-of-sample performance is evaluated using an expanding-window approach. For each test year $\tau$ from 2014 to 2026, models are trained on all prior years and evaluated on year $\tau$, mimicking a real-time forecasting setting.
 
-We require a minimum of four years of training data, so the first test year is 2014 (trained on 2010--2013). The expanding window is preferred over a rolling window because the sample is relatively short and additional training data improves stability; we verify this in the diagnostics section.
+We require a minimum of four years of training data, so the first test year is 2014 (trained on 2010--2013). The expanding window is preferred over a rolling window because the sample is relatively short and additional training data improves stability; we verify this in Section~\ref{sec:robustness}.
 
 Model performance is measured using root mean squared error (RMSE) in price levels. For change models, predictions are converted back to price levels before evaluation. The naive baseline predicts $\hat{P}_t = P_{t-1}$, corresponding to zero predicted price change.
 
@@ -416,7 +416,7 @@ This attenuation is not a statistical artifact. It reflects a real feature of th
 
 The district panel also reveals heterogeneity that is lost in the market aggregate. A freeze event in Western Arizona has a direct and immediate effect on the local price, but when averaged with Salinas (which may not experience a freeze in the same week), the signal is diluted. This helps explain why freeze risk is highly significant ($p < 0.001$) in the district panel but not significant in the market-level regressions. The dual-layer design is not just a convenience for handling missing data; it is necessary for identifying localized weather effects that aggregation would obscure.
 
-Taken together, the evidence supports the following mechanism. Weather shocks, particularly freezes and heat waves, reduce local supply in the affected district. The supply reduction raises the local FOB price. Because the market is spatially connected (buyers can substitute across districts to some extent), the price increase propagates to the market level. Once embedded in the market price, the shock persists through the autoregressive price process. The mechanism operates as follows: weather shocks reduce local supply, leading to increases in local prices, which then propagate to the market level and persist through the autoregressive price process. This mechanism reconciles the apparent disconnect between weak weather effects in aggregate regressions and strong effects in the panel estimates.
+Taken together, the evidence supports the following mechanism. Weather shocks, particularly freezes and heat waves, reduce local supply in the affected district, leading to increases in local prices. Because the market is spatially connected (buyers can substitute across districts to some extent), the price increase propagates to the market level and persists through the autoregressive price process. This mechanism reconciles the apparent disconnect between weak weather effects in aggregate regressions and strong effects in the panel estimates.
 
 % ============================================================
 \section{Robustness}
