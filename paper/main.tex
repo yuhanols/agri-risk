@@ -106,11 +106,11 @@ This production environment has an important implication for empirical analysis.
 
 We combine three publicly available data sources covering January 2010 through April 2026.
 
-\textbf{Shipment volume.} Weekly truck shipment reports from the USDA Agricultural Marketing Service \citep{usda_ams_truck} record the volume of each commodity shipped by truck from each production district. These reports provide the highest-frequency measure of supply available for lettuce. Unlike grain crops, which have annual county-level yield data, lettuce is harvested continuously within each growing season and no comparable high-frequency production data exist. Shipment volume therefore serves as a proxy for realized supply: because lettuce is highly perishable and cannot be stored for more than a few days, most production is shipped within the week it is harvested.
+\textbf{Shipment volume.} Weekly truck shipment reports from the USDA Agricultural Marketing Service \citep{usda_ams_truck} record the volume of each commodity shipped by truck from each production district, measured in units of 10,000 pounds. These reports provide the highest-frequency measure of supply available for lettuce. Unlike grain crops, which have annual county-level yield data, lettuce is harvested continuously within each growing season and no comparable high-frequency production data exist. Shipment volume therefore serves as a proxy for realized supply: because lettuce is highly perishable and cannot be stored for more than a few days, most production is shipped within the week it is harvested.
 
-\textbf{Prices.} Daily FOB (free on board) shipping point prices from USDA Market News \citep{usda_market_news} report the price at which lettuce is sold at the point of origin, before transportation costs. We focus on FOB prices rather than retail prices because they more directly reflect production-side conditions. Prices are reported by district, commodity, and package type; we aggregate daily observations to weekly averages.
+\textbf{Prices.} Daily FOB (free on board) shipping point prices from USDA Market News \citep{usda_market_news} report the price at which lettuce is sold at the point of origin, measured in dollars per carton and before transportation costs. We focus on FOB prices rather than retail prices because they more directly reflect production-side conditions. Prices are reported by district, commodity, and package type; we aggregate daily observations to weekly averages.
 
-\textbf{Weather.} Daily temperature and precipitation data come from the PRISM Climate Group at Oregon State University \citep{daly2008prism}, which provides gridded climate data at 4 km resolution for the contiguous United States. For each production district, we extract daily maximum temperature, minimum temperature, and precipitation at the district centroid and aggregate these variables to weekly measures. This construction aligns weather exposure with the timing of shipment and pricing outcomes.
+\textbf{Weather.} Daily temperature and precipitation data come from the PRISM Climate Group at Oregon State University \citep{daly2008prism}, which provides gridded climate data at 4 km resolution for the contiguous United States. For each production district, we extract daily maximum temperature, minimum temperature (both in degrees Celsius), and precipitation (in millimeters) at the district centroid and aggregate these variables to weekly measures. This construction aligns weather exposure with the timing of shipment and pricing outcomes.
 
 % ------------------------------------------------------------
 \subsection{Production Districts}
@@ -127,8 +127,6 @@ This uneven coverage has two implications. First, price data are missing non-ran
 \subsection{Variable Construction}
 \label{subsec:construction}
 % ------------------------------------------------------------
-
-Shipment volume is measured in units of 10,000 pounds, following USDA refrigerated truck movement reports.
 
 \textbf{Market-level price.} For each week, we construct a shipment-weighted average FOB price across all districts that report a price (Equation~\ref{eq:weighted_price}). Weighting by shipment volume ensures that districts with larger production have greater influence on the market price. To account for missing price observations, we define a coverage ratio (Equation~\ref{eq:coverage}) as the share of total weekly shipments for which a price is observed. The mean coverage ratio is 0.933, and 98.2\% of weeks have at least one district reporting a price. This construction yields a consistent weekly price series while also measuring data quality through the coverage ratio.
 
