@@ -83,7 +83,7 @@ The U.S.\ lettuce market is highly geographically concentrated, with California 
 
 The annual rotation between California and Arizona is largely calendar-driven and follows a stable pattern over time. Production transitions occur around weeks 15--20 (as Salinas ramps up and Arizona winds down) and weeks 45--50 (as Salinas winds down and Arizona ramps up). These transition periods are associated with temporary supply contractions and elevated price volatility. They are also particularly sensitive to weather shocks, as supply is already constrained during the shift between regions. Figure~\ref{fig:seasonal_pattern} illustrates this seasonal rotation. Salinas dominates shipments from roughly weeks 15--50, while Western Arizona dominates the winter weeks. Price spikes are concentrated around the transition periods, when total supply is temporarily thinner.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig1_seasonal_pattern.pdf}
 \caption{Seasonal shipment and price patterns by production district. Panel (a) shows average weekly shipment volume and panel (b) shows average FOB price, both by week of year across the 2010--2026 sample. Gray bands indicate the spring (weeks 14--18) and fall (weeks 44--50) transition periods.}
@@ -143,7 +143,7 @@ Shipment volume is measured in units of 10,000 pounds, following USDA refrigerat
 
 Table~\ref{tab:summary} reports summary statistics for the market-level dataset. The mean weekly iceberg lettuce FOB price is \$16.27 per carton with a standard deviation of \$11.80. The distribution is right-skewed, with a median of \$12.30 and a maximum of \$94.33, reached during the 2022 INSV outbreak. Mean weekly shipment volume is 4,422 (in 10,000 lb units). Extreme weather events are relatively infrequent at the market level: freeze risk occurs in 14 of 849 weeks (1.6\%), extreme heat in 6 weeks (0.7\%), and heavy rain in 68 weeks (8.0\%).
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Summary statistics: Market-level dataset (849 weekly observations, 2010--2026)}
 \label{tab:summary}
@@ -291,7 +291,7 @@ Both tree-based methods perform worse than OLS in level models. XGBoost averages
 
 The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost and Random Forest produced much larger errors, with RMSEs of \$24.37 and \$23.83, respectively. Because the training data contain no comparable price spike, the tree-based models substantially underpredict the 2022 peak. This illustrates a limitation of tree-based methods in small-sample time series settings: they are generally poor at extrapolating beyond the range of the training data, while linear autoregressive models can extend trends through the lagged price coefficient.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Out-of-sample model comparison: average RMSE and MAE (2014--2026, expanding window)}
 \label{tab:model_comparison}
@@ -317,7 +317,7 @@ Naive ($P_t = P_{t-1}$) & 5.11 & 3.35 & baseline \\
 
 Figure~\ref{fig:actual_predicted} plots actual and predicted market-level prices from the OLS model. The model tracks normal years closely, while most large errors occur during the 2022 price spike driven by the INSV outbreak.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/fig2_actual_vs_predicted.pdf}
 \caption{Market-level iceberg lettuce price: actual vs.\ OLS predicted (out-of-sample, expanding window, 2014--2026). Panel (a) shows the price time series; the red band highlights 2022. Panel (b) shows prediction errors (actual minus predicted).}
@@ -335,7 +335,7 @@ The change models tell a different story. When we difference out price persisten
 
 Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.4\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) increase as well. The weather signal was present in the data but was masked by price persistence in the level specification. Figure~\ref{fig:feature_importance} visualizes this shift.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig3_feature_importance.pdf}
 \caption{XGBoost feature importance: price level vs.\ price change models. The level model is dominated by lagged prices, particularly Price~$(t\!-\!1)$. In the change model, where price lags are removed by construction, importance is redistributed toward weather, volume, and seasonal variables.}
@@ -351,7 +351,7 @@ Table~\ref{tab:volume} reports results for market-level shipment volume predicti
 
 Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Volume prediction: average RMSE and MAE (10,000 lbs, expanding window, 2014--2026)}
 \label{tab:volume}
@@ -384,7 +384,7 @@ Table~\ref{tab:district_weather} reports weather coefficients from the district 
 
 Freeze risk is the strongest and most robust weather predictor. In the change model, a week with at least one day below freezing is associated with a price increase of \$2.33 ($p < 0.001$). This estimate is stable across specifications: adding volume controls and lagged weather changes the coefficient only slightly, from \$2.33 to \$2.37 to \$2.24. Minimum temperature has a significant negative coefficient ($-\$0.15$ to $-\$0.17$ per degree Celsius, $p < 0.01$), which is the continuous counterpart of the freeze risk indicator: colder weeks are associated with higher prices. Extreme heat is significant in the level specification (\$2.16, $p = 0.008$) but not in the change models, suggesting that heat effects operate over a slightly longer horizon than week-to-week changes can capture.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{District-level weather coefficients (Iceberg, OLS with clustered SE)}
 \label{tab:district_weather}
@@ -430,7 +430,7 @@ Taken together, the evidence supports the following mechanism. Weather shocks, p
 
 We replicate the core analysis using Romaine lettuce prices instead of Iceberg. Table~\ref{tab:romaine} compares the two varieties. The market-level OLS model achieves an out-of-sample RMSE of \$2.61 for Romaine, compared to \$4.36 for Iceberg. The lower RMSE reflects lower price volatility rather than improved model fit; the in-sample $R^2$ is actually higher for Romaine (0.952 vs.\ 0.891).
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Romaine vs.\ Iceberg: model performance and weather coefficients}
 \label{tab:romaine}
@@ -464,7 +464,7 @@ More importantly, the weather coefficients have consistent signs across the two 
 
 Table~\ref{tab:window} compares expanding-window and five-year rolling-window validation. The expanding window produces a lower average RMSE (\$4.36 vs.\ \$4.57). The two approaches yield nearly identical results in early test years, when they share the same training set. The gap widens in later years: in 2021, the expanding window achieves \$3.41 vs.\ \$4.61 for rolling, and in 2022 the gap is \$7.77 vs.\ \$9.22. The expanding window benefits from a larger training sample, and the data-generating process appears sufficiently stable that older observations remain informative.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Expanding vs.\ rolling window: year-by-year RMSE (\$)}
 \label{tab:window}
@@ -502,14 +502,14 @@ Table~\ref{tab:coverage} shows that weeks with low price coverage are harder to 
 
 The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution. Figure~\ref{fig:coverage_error} shows the underlying scatter, confirming the monotonic relationship between coverage and prediction accuracy.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.75\textwidth]{figures/fig4_coverage_vs_error.pdf}
 \caption{Price coverage ratio vs.\ absolute prediction error. Each point is one out-of-sample week. Red markers show bin averages with sample sizes. Prediction errors decline monotonically as coverage increases, consistent with measurement error in the shipment-weighted price.}
 \label{fig:coverage_error}
 \end{figure}
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Prediction error by coverage ratio}
 \label{tab:coverage}
@@ -533,7 +533,7 @@ Very high ($> 0.95$) & 480 & 2.83 & 1.84 & 18.1 \\
 
 The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} summarizes the key statistics. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley that severely disrupted production.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{2022 extreme year: model performance comparison}
 \label{tab:extreme2022}
@@ -568,7 +568,7 @@ We split the sample into three sub-periods and re-estimate the market-level OLS 
 
 The temperature variables ($tmax$, $tmin$) show sign instability, which likely reflects collinearity between them rather than instability in the underlying relationship. Freeze risk also varies across periods, consistent with its low frequency making it sensitive to individual events within each sub-sample.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Coefficient stability across sub-periods (market-level OLS)}
 \label{tab:stability}
@@ -594,7 +594,7 @@ Not all district-week observations have reported prices. Out of 2,441 district-w
 
 Table~\ref{tab:missing} compares predicted and observed mean prices by district. The predicted prices for missing observations are systematically higher than the observed means. For example, the predicted mean for Oxnard's missing weeks is \$17.72 vs.\ an observed mean of \$15.30. This pattern is consistent with non-random missingness in price reporting: districts may be less likely to report prices during periods of high prices or supply stress.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Missing price prediction by district}
 \label{tab:missing}
@@ -651,7 +651,7 @@ This appendix provides supplementary materials. Appendix~\ref{app:variables} def
 \label{app:variables}
 % ============================================================
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Variable definitions and data sources}
 \label{tab:vardef}
@@ -699,7 +699,7 @@ Variable & Definition & Unit & Source \\
 \label{app:ols_full}
 % ============================================================
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Full OLS regression: market-level price model ($N = 823$, $R^2 = 0.891$)}
 \label{tab:ols_full}
@@ -751,7 +751,7 @@ Variable & Coeff. & Robust SE & $z$ & $p$-value \\
 \label{app:yearly_rmse}
 % ============================================================
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Out-of-sample RMSE by year (\$, expanding window)}
 \label{tab:yearly_rmse}
