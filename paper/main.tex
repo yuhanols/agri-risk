@@ -45,7 +45,7 @@ This paper studies how weather shocks affect supply and prices in the U.S.\ iceb
 
 Our empirical strategy combines market-level aggregation for prediction with district-level panel variation for identification. At the market level, we aggregate all districts into a single weekly time series and estimate price and volume prediction models using OLS, XGBoost, and Random Forest. At the district level, we retain a three-district panel and use fixed effects to identify the causal effect of local weather shocks on prices. Both layers are necessary because aggregation improves data coverage (from 78\% to 98\% of weeks with observed prices) but dilutes the weather signal.
 
-First, simple linear models outperform tree-based machine learning methods across all prediction tasks, including price levels, price changes, and shipment volume. The best market-level price model achieves an out-of-sample RMSE of \$4.36, a 15\% improvement over a naive autoregressive baseline. XGBoost and Random Forest perform worse than the baseline in level models and offer no improvement in change models. This reflects a data-generating process dominated by strong price persistence and approximate linearity, under which additional model complexity does not improve predictive performance and reduces robustness in extreme periods.
+First, simple linear models outperform tree-based machine learning methods in level prediction tasks and perform comparably in change models. The best market-level price model achieves an out-of-sample RMSE of \$4.36, a 14.7\% improvement over a naive autoregressive baseline. XGBoost and Random Forest perform substantially worse than the baseline in level models, and in change models all methods converge to similar performance. This reflects a data-generating process dominated by strong price persistence and approximate linearity, under which additional model complexity does not improve predictive performance and reduces robustness in extreme periods.
 
 Second, weather effects on prices are present but obscured by price persistence in aggregate data. In level models, the three price lags together account for nearly half of total feature importance, leaving weather variables with little apparent explanatory power. When we model week-to-week price changes instead, removing the autoregressive component by construction, weather variables become substantially more important. At the district level, a frost event increases the local weekly price by \$2.33 ($p < 0.001$), while this effect is attenuated in market-level aggregates. The mechanism runs from weather to local supply disruption to local price increases, which then persist through the autoregressive structure of the market.
 
@@ -315,7 +315,7 @@ Naive ($P_t = P_{t-1}$) & 5.11 & 3.35 & baseline \\
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:actual_predicted} plots actual and predicted market-level prices from the OLS model. The model tracks normal years closely, while most large errors occur during the 2022 price spike driven by the INSV outbreak. This pattern is consistent with the limited extrapolation ability of tree-based models in small-sample time series settings.
+Figure~\ref{fig:actual_predicted} plots actual and predicted market-level prices from the OLS model. The model tracks normal years closely, while most large errors occur during the 2022 price spike driven by the INSV outbreak.
 
 \begin{figure}[!htbp]
 \centering
@@ -329,11 +329,11 @@ Figure~\ref{fig:actual_predicted} plots actual and predicted market-level prices
 \label{subsec:persistence}
 % ------------------------------------------------------------
 
-In the full level regression, the lagged price coefficient is 1.365 ($p < 0.001$), and the in-sample $R^2$ is 0.891. The one-week lagged price alone accounts for 28\% of total feature importance in the XGBoost level model, and the three price lags together account for 47\%, indicating that price persistence dominates the predictive structure. Precipitation is statistically significant ($\hat{\beta} = 0.123$, $p = 0.010$), but its economic magnitude is small relative to the lagged price term.
+In the full level regression, the lagged price coefficient is 1.369 ($p < 0.001$), and the in-sample $R^2$ is 0.891. The one-week lagged price alone accounts for 30\% of total feature importance in the XGBoost level model, and the three price lags together account for 45\%, indicating that price persistence dominates the predictive structure. Precipitation is statistically significant ($\hat{\beta} = 0.123$, $p = 0.010$), but its economic magnitude is small relative to the lagged price term.
 
-The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, the three estimation methods converge: OLS, XGBoost, and Random Forest all produce average RMSEs within a narrow range of \$5.00 to \$5.13. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
+The change models tell a different story. When we difference out price persistence by modeling $\Delta P_t$ instead of $P_t$, two things happen. First, all methods converge: OLS, XGBoost, Random Forest, and the log-differenced OLS all produce average RMSEs within a narrow range of \$5.00 to \$5.12. The gap between OLS and tree-based methods disappears because the dominant linear feature, lagged price, has been removed. The residual relationship between weather and price changes is approximately linear, so nonlinear methods offer no advantage.
 
-Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.4\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 7.5\%, and other weather variables (precipitation, diurnal range) increase as well. This confirms that the weather signal is present in the data but is masked by price persistence in the level specification. Figure~\ref{fig:feature_importance} visualizes this shift.
+Second, and more importantly, the relative importance of weather variables increases substantially. In the level model, temperature ($tmax$) contributes only 2.8\% of feature importance. In the change model, where price lags are excluded by construction, temperature importance rises to 6.0\%, and other weather variables (precipitation, diurnal range) increase as well. This confirms that the weather signal is present in the data but is masked by price persistence in the level specification. Figure~\ref{fig:feature_importance} visualizes this shift.
 
 \begin{figure}[!htbp]
 \centering
@@ -709,7 +709,7 @@ Variable & Definition & Unit & Source \\
 Variable & Coeff. & Robust SE & $z$ & $p$-value \\
 \midrule
 \textit{Price and volume lags} \\
-\quad price\_lag1 & 1.365 & 0.042 & 32.15 & $<$0.001 \\
+\quad price\_lag1 & 1.369 & 0.042 & 32.15 & $<$0.001 \\
 \quad price\_lag2 & $-$0.568 & 0.049 & $-$11.64 & $<$0.001 \\
 \quad price\_lag4 & 0.066 & 0.024 & 2.75 & 0.006 \\
 \quad volume\_lag1 & $-$0.001 & 0.001 & $-$1.33 & 0.185 \\
