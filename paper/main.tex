@@ -181,14 +181,15 @@ We address this by constructing two datasets from the same underlying weekly pan
 \label{eq:weighted_price}
 P_t = \frac{\sum_{i} V_{it} \cdot P_{it}}{\sum_{i} V_{it}},
 \end{equation}
-where $V_{it}$ is iceberg lettuce shipment volume from district $i$ in week $t$, and the sum runs over districts with nonmissing prices. Weather variables are aggregated analogously using shipment weights. This produces 849 weekly observations with 98.2\% price coverage. The coverage ratio,
+
+where $V_{it}$ is iceberg lettuce shipment volume from district $i$ in week $t$, and the sum is taken over districts with nonmissing prices. Weather variables are aggregated in the same way using shipment weights, so that conditions in higher-volume districts receive greater weight. This yields 849 weekly observations, with 98.2\% of weeks having at least one observed price. The coverage ratio,
 \begin{equation}
 \label{eq:coverage}
 C_t = \frac{\sum_{i \in \text{priced}} V_{it}}{\sum_{i} V_{it}},
 \end{equation}
 measures the share of total shipments for which a price is observed and serves as a data quality indicator.
 
-\textbf{Dataset B: District-level panel.} We retain the three districts with both substantial shipment volume and relatively consistent price reporting: Salinas-Watsonville, Western Arizona, and Imperial Valley. This panel contains 1,466 observations with 78.4\% price coverage.
+\textbf{Dataset B: District-level panel.} We retain the three districts with both substantial shipment volume and relatively consistent price reporting: Salinas-Watsonville, Western Arizona, and Imperial Valley. This panel contains 1,466 observations and substantially higher price coverage than the full six-district panel.
 
 The two datasets serve distinct roles. Dataset A is used for prediction, where complete coverage and a continuous time series are essential. Dataset B is used for identification, where cross-district variation in weather provides the identifying variation.
 
@@ -229,7 +230,7 @@ Comparing the level and change specifications allows us to assess whether weathe
 
 The district panel exploits cross-sectional variation in weather exposure that is averaged out at the market level. A freeze event in Yuma, for example, affects local prices directly but is diluted when aggregated with regions that do not experience the same shock.
 
-Identification relies on the assumption that short-run weather variation affects supply but not demand. Weather shocks influence prices through crop damage and harvest disruptions rather than contemporaneous shifts in consumer demand. This assumption is standard in the agricultural economics literature and is plausible at the weekly frequency considered here.
+Identification relies on the assumption that short-run weather variation affects supply but not demand. Weather shocks influence prices primarily through crop damage and harvest disruptions rather than contemporaneous shifts in consumer demand. This assumption is standard in the agricultural economics literature and is particularly plausible at the weekly frequency considered here, where consumption patterns are relatively stable and unlikely to respond immediately to short-run weather fluctuations.
 
 The district panel specification is
 \begin{equation}
