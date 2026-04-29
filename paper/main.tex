@@ -134,6 +134,14 @@ This uneven coverage has two implications. First, price data are missing non-ran
 
 \textbf{Extreme weather indicators.} Using the daily weather data, we construct three indicator variables for each district-week. The variable $freeze\_risk$ equals one if the minimum temperature falls below 0\textdegree C on any day within the week. The variable $extreme\_heat$ equals one if the maximum temperature exceeds 40\textdegree C on any day within the week. The variable $heavy\_rain$ equals one if total weekly precipitation exceeds 25 mm. At the market level, each indicator equals one if any active district experiences the event.
 
+\textbf{Lagged variables.} For prices, shipment volume, temperature, and precipitation, we include lags at 1, 2, and 4 weeks to capture short-run persistence and the production cycle.
+
+\textbf{Rolling averages.} Four-week rolling means of volume and weather variables capture the recent background state of the market.
+
+\textbf{Market structure.} The coverage ratio $C_t$ and the number of active districts $n_t$ enter as controls.
+
+\textbf{Seasonality.} Month and week-of-year enter as continuous variables to capture the strong seasonal pattern in production and prices.
+
 % ------------------------------------------------------------
 \subsection{Summary Statistics}
 \label{subsec:summary}
@@ -165,7 +173,7 @@ Active districts (count) & 2.9 & 1.1 & 2.0 & 6.0 \\
 \label{sec:methods}
 % ============================================================
 
-This section describes the empirical framework. Section~\ref{subsec:dual_layer} outlines the dual-layer design that motivates the two datasets. Sections~\ref{subsec:market_model}--\ref{subsec:district_panel} present the model specifications. Section~\ref{subsec:features} describes feature construction, and Section~\ref{subsec:validation} details the out-of-sample validation strategy.
+This section describes the empirical framework. Section~\ref{subsec:dual_layer} outlines the dual-layer design that motivates the two datasets. Sections~\ref{subsec:market_model}--\ref{subsec:district_panel} present the model specifications, and Section~\ref{subsec:validation} details the out-of-sample validation strategy.
 
 % ------------------------------------------------------------
 \subsection{Dual-Layer Design}
@@ -245,23 +253,6 @@ We also estimate a level specification that includes lagged prices:
 P_{it} = \boldsymbol{\phi}' \mathbf{W}_{it} + \boldsymbol{\psi}' \mathbf{L}_{it} + \alpha_i + \mu_q + \eta_{iq} + \nu_{it}.
 \end{equation}
 Comparing the level and change specifications at the district level provides an additional check on whether persistence attenuates estimated weather effects.
-
-% ------------------------------------------------------------
-\subsection{Feature Construction}
-\label{subsec:features}
-% ------------------------------------------------------------
-
-All models use the same set of constructed features.
-
-\textbf{Weather variables.} Weekly weather includes maximum and minimum temperature ($tmax$, $tmin$), total precipitation ($ppt$), and diurnal range ($tmax - tmin$). Three indicators capture extreme conditions: $freeze\_risk$ equals one if minimum temperature falls below 0\textdegree C during the week, $extreme\_heat$ equals one if maximum temperature exceeds 40\textdegree C, and $heavy\_rain$ equals one if weekly precipitation exceeds 25 mm.
-
-\textbf{Lagged variables.} For prices, shipment volume, temperature, and precipitation, we include lags at 1, 2, and 4 weeks to capture short-run persistence and the production cycle.
-
-\textbf{Rolling averages.} Four-week rolling means of volume and weather variables capture the recent background state of the market.
-
-\textbf{Market structure.} The coverage ratio $C_t$ and the number of active districts $n_t$ enter as controls.
-
-\textbf{Seasonality.} Month and week-of-year enter as continuous variables to capture the strong seasonal pattern in production and prices.
 
 % ------------------------------------------------------------
 \subsection{Validation Strategy}
