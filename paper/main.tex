@@ -27,7 +27,7 @@
 
 \begin{abstract}
 \noindent
-This paper constructs a weekly dataset that integrates USDA shipment data, FOB (free on board) prices, and weather data to study weather-driven supply and price dynamics in U.S.\ lettuce markets from 2010 to 2026. Using an empirical strategy that combines market-level aggregation for prediction with district-level panel variation for identification, we document three results. First, simple linear models outperform tree-based machine learning methods. OLS achieves substantially lower prediction error than XGBoost and Random Forest (RMSE \$4.36 versus \$6.67 and \$6.81), reflecting strong price persistence and a data-generating process that is largely linear conditional on lagged prices. Second, weather effects on prices are present but attenuated in aggregate data. In district-level panels, frost events increase weekly prices by \$2.33 ($p < 0.001$), while these effects are diluted in market-level regressions due to price persistence and spatial aggregation. Third, these patterns are robust across lettuce varieties, including Romaine, and across alternative validation strategies. These results show that downstream market outcomes, shipment volumes and FOB prices, can be used to identify weather-driven supply responses even in the absence of direct yield measures.
+This paper constructs a weekly dataset that integrates USDA shipment data, FOB (free on board) prices, and weather data to study weather-driven supply and price dynamics in U.S.\ lettuce markets from 2010 to 2026. Using an empirical strategy that combines market-level aggregation for prediction with district-level panel variation for identification, we document three results. First, simple linear models outperform tree-based machine learning methods. OLS achieves substantially lower prediction error than XGBoost and Random Forest (RMSE \$4.36 versus \$6.67 and \$6.81), reflecting strong price persistence and a data-generating process that is largely linear conditional on lagged prices. Second, weather effects on prices are present but attenuated in aggregate data. In district-level panels, freeze events increase weekly prices by \$2.33 ($p < 0.001$), while these effects are diluted in market-level regressions due to price persistence and spatial aggregation. Third, these patterns are robust across lettuce varieties, including Romaine, and across alternative validation strategies. These results show that downstream market outcomes, shipment volumes and FOB prices, can be used to identify weather-driven supply responses even in the absence of direct yield measures.
 \end{abstract}
 
 \newpage
@@ -281,7 +281,7 @@ Both tree-based methods perform worse than OLS in level models. XGBoost averages
 
 In contrast, the change models yield similar predictive performance across all methods. OLS, XGBoost, and Random Forest produce RMSE values within a narrow range of \$5.00 to \$5.12, with no model clearly outperforming the others. This convergence reflects the removal of the dominant autoregressive component present in price levels. Once price persistence is differenced out, the remaining variation is weaker and harder to predict.
 
-The year-by-year results reveal the source of the gap most clearly in 2022. That year, an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost and Random Forest produced much larger errors, with RMSEs of \$24.37 and \$23.83, respectively. Because the training data contain no comparable price spike, the tree-based models substantially underpredict the 2022 peak. This illustrates a limitation of tree-based methods in small-sample time series settings: they are generally poor at extrapolating beyond the range of the training data, while linear autoregressive models can extend trends through the lagged price coefficient.
+The year-by-year results reveal the source of the gap most clearly in 2022. That year, an INSV outbreak in the Salinas Valley disrupted production severely, and the weekly FOB price for iceberg lettuce reached \$94.33, roughly five times the sample mean. OLS tracked the spike with an RMSE of \$7.77 for that year, while XGBoost and Random Forest produced much larger errors, with RMSEs of \$24.37 and \$23.83, respectively. Because the training data contain no comparable price spike, the tree-based models substantially underpredict the 2022 peak. This illustrates a limitation of tree-based methods in small-sample time series settings: they are generally poor at extrapolating beyond the range of the training data, while linear autoregressive models can extend trends through the lagged price coefficient.
 
 \begin{table}[!htbp]
 \centering
@@ -482,7 +482,7 @@ Year & RMSE & MAE & RMSE & MAE \\
 
 Table~\ref{tab:coverage} shows that weeks with low price coverage are harder to predict. When the coverage ratio falls below 0.5, the average MAE is \$4.98, nearly double the \$2.83 for weeks with coverage above 0.95. This pattern is consistent with measurement error in the shipment-weighted price: when fewer districts report prices, the weighted average is noisier, and the model has less reliable training signal. Including the coverage ratio as a feature helps the model partially adjust for this, but it cannot fully compensate for missing price information.
 
-The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution. Figure~\ref{fig:coverage_error} shows the underlying scatter, confirming the monotonic relationship between coverage and prediction accuracy.
+The low-coverage bin (0.5--0.7) contains only one observation and should be interpreted with caution. Figure~\ref{fig:coverage_error} shows the underlying scatter, confirming the generally declining relationship between coverage and prediction error.
 
 \begin{figure}[!htbp]
 \centering
@@ -513,7 +513,7 @@ Very high ($> 0.95$) & 480 & 2.83 & 1.84 & 18.1 \\
 \label{subsec:extreme_2022}
 % ------------------------------------------------------------
 
-The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} summarizes the key statistics. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an outbreak of Impatiens Necrotic Spot Virus (INSV) in the Salinas Valley that severely disrupted production.
+The 2022 crop year was an outlier by any measure. Table~\ref{tab:extreme2022} summarizes the key statistics. Weekly iceberg lettuce prices averaged \$31.89 with a standard deviation of \$27.09, compared to typical years where the mean is around \$15 and the standard deviation is around \$5. The maximum weekly price reached \$94.33, driven by an INSV outbreak in the Salinas Valley that severely disrupted production.
 
 \begin{table}[!htbp]
 \centering
@@ -708,7 +708,7 @@ Variable & Coeff. & Robust SE & $z$ & $p$-value \\
 \quad week\_of\_year & $-$0.011 & 0.033 & $-$0.33 & 0.741 \\
 \quad constant & 7.140 & 2.051 & 3.48 & $<$0.001 \\
 \midrule
-\multicolumn{5}{l}{RMSE = \$3.96. Dependent variable: shipment-weighted FOB price (\$/carton).} \\
+\multicolumn{5}{l}{RMSE = \$3.97. Dependent variable: shipment-weighted FOB price (\$/carton).} \\
 \bottomrule
 \end{tabular}
 \end{table}
