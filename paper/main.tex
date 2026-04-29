@@ -375,9 +375,11 @@ Taken together, the evidence supports the following mechanism. Weather shocks, p
 \label{subsec:volume}
 % ------------------------------------------------------------
 
-Table~\ref{tab:volume} reports results for market-level shipment volume prediction. The pattern mirrors the price results: OLS outperforms XGBoost. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463. XGBoost achieves 354, better than the naive baseline but well behind OLS.
+Table~\ref{tab:volume} reports results for market-level shipment volume prediction. Consistent with the price results, OLS substantially outperforms XGBoost. The OLS level model achieves an average RMSE of 287, a 38.0\% improvement over the naive baseline of 463, while XGBoost achieves 354, improving on the baseline but remaining well behind OLS.
 
-Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). Heavy rain disrupts field operations and harvest logistics, reducing the volume of lettuce that can be shipped in a given week. Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), likely because freeze events are infrequent in the sample.
+Precipitation is the most consistent weather predictor of volume. In the OLS level model, the coefficient on weekly precipitation is $-9.0$ (in 10,000 lb units) per millimeter ($p = 0.015$). This reflects disruptions to field operations and harvest logistics, which reduce the volume of lettuce that can be shipped in a given week. This pattern is consistent with the mechanism identified above, where precipitation affects prices indirectly through its impact on shipment volumes.
+
+Freeze risk has a large negative point estimate ($-195$) but is not statistically significant at conventional levels ($p = 0.12$), possibly reflecting the limited number of freeze events in the sample.
 
 \begin{table}[!htbp]
 \centering
