@@ -43,7 +43,7 @@ Fresh produce supply chains are exposed to weather risk, but translating weather
 
 This paper studies how weather shocks affect supply and prices in the U.S.\ iceberg lettuce market. Lettuce is the largest fresh vegetable crop in the United States by volume and is produced year-round through a seasonal rotation between California (spring through fall) and Arizona (winter). We construct a weekly dataset that integrates USDA truck shipment volumes, FOB shipping point prices, and gridded weather data from PRISM, covering six production districts over the period 2010--2026.
 
-Our empirical strategy combines market-level aggregation for prediction with district-level panel variation for identification. At the market level, we aggregate all districts into a single weekly time series and estimate price and volume prediction models using OLS, XGBoost, and Random Forest. At the district level, we retain a three-district panel and use fixed effects to identify the causal effect of local weather shocks on prices. Both layers are necessary because aggregation improves data coverage (from 78\% to 98\% of weeks with observed prices) but dilutes the weather signal.
+Our empirical strategy combines market-level aggregation for prediction with district-level panel variation for identification. At the market level, we aggregate all districts into a single weekly time series and estimate price and volume prediction models using OLS, XGBoost, and Random Forest. At the district level, we retain a three-district panel and use fixed effects to identify the causal effect of local weather shocks on prices. Both layers are necessary because aggregation improves data coverage (from 72\% to 98\% of weeks with observed prices) but dilutes the weather signal.
 
 First, simple linear models outperform tree-based machine learning methods in level prediction tasks and perform comparably in change models. The best market-level price model achieves an out-of-sample RMSE of \$4.36, a 14.7\% improvement over a naive autoregressive baseline. XGBoost and Random Forest perform substantially worse than the baseline in level models, but in change models all methods converge to similar performance. This reflects a data-generating process dominated by strong price persistence and approximate linearity, under which additional model complexity does not improve predictive performance and reduces robustness in extreme periods.
 
@@ -180,7 +180,7 @@ This section describes the empirical framework. Section~\ref{subsec:dual_layer} 
 \label{subsec:dual_layer}
 % ------------------------------------------------------------
 
-The U.S.\ lettuce market spans six production districts across California and Arizona, but not all districts report FOB prices every week. In particular, the three smaller districts (Santa Maria, Oxnard, and San Joaquin Valley) exhibit substantial gaps in price reporting. A district-level panel including all six districts would have a price coverage rate of only 78.4\%, making it unsuitable for time-series prediction.
+The U.S.\ lettuce market spans six production districts across California and Arizona, but not all districts report FOB prices every week. In particular, the three smaller districts (Santa Maria, Oxnard, and San Joaquin Valley) exhibit substantial gaps in price reporting. A district-level panel including all six districts would have a price coverage rate of only 72\%, making it unsuitable for time-series prediction.
 
 We address this by constructing two datasets from the same underlying weekly panel. The first aggregates all six districts into a single market-level time series. The second retains the three core districts (Salinas-Watsonville, Western Arizona, and Imperial Valley) as a panel.
 
@@ -197,7 +197,7 @@ C_t = \frac{\sum_{i \in \text{priced}} V_{it}}{\sum_{i} V_{it}},
 \end{equation}
 measures the share of total shipments for which a price is observed and serves as a data quality indicator.
 
-\textbf{Dataset B: District-level panel.} We retain the three districts with both substantial shipment volume and relatively consistent price reporting: Salinas-Watsonville, Western Arizona, and Imperial Valley. This panel contains 1,466 observations and substantially higher price coverage than the full six-district panel.
+\textbf{Dataset B: District-level panel.} We retain the three districts with both substantial shipment volume and relatively consistent price reporting: Salinas-Watsonville, Western Arizona, and Imperial Valley. This panel contains 1,466 observations with 78\% price coverage, higher than the 72\% in the full six-district panel.
 
 The two datasets serve distinct roles. Dataset A is used for prediction, where complete coverage and a continuous time series are essential. Dataset B is used for identification, where cross-district variation in weather provides the identifying variation.
 
