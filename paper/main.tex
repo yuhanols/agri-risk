@@ -330,7 +330,7 @@ Second, the relative importance of weather variables increases substantially. Fi
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig3_feature_importance.pdf}
-\caption{XGBoost feature importance: price level vs.\ price change models. The level model is dominated by lagged prices, particularly Price~$(t\!-\!1)$. In the change model, where price lags are removed by construction, importance is redistributed toward weather, volume, and seasonal variables.}
+\caption{Feature importance in price models. In the level model, lagged prices, particularly Price~$(t\!-\!1)$, dominate predictive importance. In the change model, where price lags are excluded by construction, importance shifts toward weather, volume, and seasonal variables.}
 \label{fig:feature_importance}
 \end{figure}
 
