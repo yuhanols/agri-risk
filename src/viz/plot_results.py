@@ -148,12 +148,12 @@ fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True,
 
 # Panel A: price series
 ax = axes[0]
-ax.plot(pred["week_ending"], pred["actual"], color="black", linewidth=0.7,
+ax.plot(pred["week_ending"], pred["actual"], color="#1565C0", linewidth=0.7,
         label="Actual", alpha=0.9)
-ax.plot(pred["week_ending"], pred["predicted"], color="#E53935", linewidth=0.7,
+ax.plot(pred["week_ending"], pred["predicted"], color="#E67E22", linewidth=0.7,
         label="OLS predicted", alpha=0.8)
 ax.fill_between(pred["week_ending"], pred["actual"], pred["predicted"],
-                alpha=0.12, color="#E53935")
+                alpha=0.12, color="#E67E22")
 
 # Highlight 2022
 yr22 = pred[pred["year"] == 2022]
