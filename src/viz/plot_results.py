@@ -150,10 +150,10 @@ fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True,
 ax = axes[0]
 ax.plot(pred["week_ending"], pred["actual"], color="black", linewidth=0.7,
         label="Actual", alpha=0.9)
-ax.plot(pred["week_ending"], pred["predicted"], color="#1565C0", linewidth=0.7,
+ax.plot(pred["week_ending"], pred["predicted"], color="#E53935", linewidth=0.7,
         label="OLS predicted", alpha=0.8)
 ax.fill_between(pred["week_ending"], pred["actual"], pred["predicted"],
-                alpha=0.12, color="#1565C0")
+                alpha=0.12, color="#E53935")
 
 # Highlight 2022
 yr22 = pred[pred["year"] == 2022]
