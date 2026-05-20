@@ -23,7 +23,7 @@ mkt = pd.read_csv(PROC / "market_iceberg_weekly.csv", parse_dates=["week_ending"
 
 FEATURES = [
     "tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-    "extreme_heat", "freeze_risk", "heavy_rain",
+    "dd_heat", "dd_freeze", "heavy_rain",
     "tmax_lag1", "tmax_lag2", "ppt_lag1",
     "tmax_avg_roll4_mean", "ppt_total_roll4_mean",
     "price_lag1", "price_lag2", "price_lag4",
@@ -188,8 +188,8 @@ for label, y1, y2 in periods:
 if coef_stability:
     cs = pd.DataFrame(coef_stability)
     # Show key weather variables
-    key_vars = ["tmax_avg", "tmin_avg", "ppt_total", "freeze_risk",
-                "extreme_heat", "heavy_rain", "price_lag1"]
+    key_vars = ["tmax_avg", "tmin_avg", "ppt_total", "dd_freeze",
+                "dd_heat", "heavy_rain", "price_lag1"]
     print(f"{'Variable':<20}", end="")
     for label in coef_stability:
         print(f" {label:>12}", end="")

@@ -33,7 +33,7 @@ mkt["dvolume"] = mkt["volume"] - mkt["volume_lag1"]
 # ============================================================
 WEATHER = [
     "tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-    "extreme_heat", "freeze_risk", "heavy_rain",
+    "dd_heat", "dd_freeze", "heavy_rain",
 ]
 
 WEATHER_LAGS = [

@@ -41,6 +41,7 @@ dist = dist[["week_ending", "district", "state",
               "tmax_avg", "tmin_avg", "tmax_max", "tmin_min",
               "ppt_total", "ppt_days", "tmean_avg", "diurnal_range",
               "extreme_heat", "freeze_risk", "heavy_rain",
+              "dd_heat", "dd_freeze",
               "year", "month", "week_of_year", "is_partial_year"]].copy()
 
 dist = dist.rename(columns={"vol_iceberg": "volume", "price_iceberg": "price"})
@@ -111,9 +112,12 @@ for wk in weeks:
         extreme_heat = vol_nonzero["extreme_heat"].max()
         freeze_risk = vol_nonzero["freeze_risk"].max()
         heavy_rain = vol_nonzero["heavy_rain"].max()
+        w_dd_heat = (v * vol_nonzero["dd_heat"]).sum() / v.sum()
+        w_dd_freeze = (v * vol_nonzero["dd_freeze"]).sum() / v.sum()
     else:
         w_tmax = w_tmin = w_ppt = w_tmean = w_diurnal = np.nan
         extreme_heat = freeze_risk = heavy_rain = 0
+        w_dd_heat = w_dd_freeze = np.nan
 
     # Number of active districts
     n_districts = (wk_data["vol_iceberg"] > 0).sum()
@@ -132,6 +136,8 @@ for wk in weeks:
         "extreme_heat": extreme_heat,
         "freeze_risk": freeze_risk,
         "heavy_rain": heavy_rain,
+        "dd_heat": round(w_dd_heat, 3) if not np.isnan(w_dd_heat) else np.nan,
+        "dd_freeze": round(w_dd_freeze, 3) if not np.isnan(w_dd_freeze) else np.nan,
     })
 
 mkt = pd.DataFrame(market_rows)

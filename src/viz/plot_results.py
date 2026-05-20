@@ -43,7 +43,7 @@ pred = pd.read_csv(OUT / "diagnostics_predictions.csv", parse_dates=["week_endin
 
 FEATURES_LEVEL = [
     "tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-    "extreme_heat", "freeze_risk", "heavy_rain",
+    "dd_heat", "dd_freeze", "heavy_rain",
     "tmax_lag1", "tmax_lag2", "ppt_lag1",
     "tmax_avg_roll4_mean", "ppt_total_roll4_mean",
     "price_lag1", "price_lag2", "price_lag4",
@@ -53,7 +53,7 @@ FEATURES_LEVEL = [
 
 FEATURES_CHANGE = [
     "tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-    "extreme_heat", "freeze_risk", "heavy_rain",
+    "dd_heat", "dd_freeze", "heavy_rain",
     "tmax_lag1", "tmax_lag2", "ppt_lag1",
     "tmax_avg_roll4_mean", "ppt_total_roll4_mean",
     "volume_lag1", "volume_lag2", "volume_roll4_mean",
@@ -72,8 +72,8 @@ FEAT_LABELS = {
     "tmin_avg": "Min temp",
     "ppt_total": "Precipitation",
     "diurnal_range": "Diurnal range",
-    "extreme_heat": "Extreme heat",
-    "freeze_risk": "Freeze risk",
+    "dd_heat": "Heat degree days",
+    "dd_freeze": "Freeze degree days",
     "heavy_rain": "Heavy rain",
     "tmax_lag1": "Max temp (t-1)",
     "tmax_lag2": "Max temp (t-2)",

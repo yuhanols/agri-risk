@@ -22,7 +22,7 @@ mkt = pd.read_csv(PROC / "market_iceberg_weekly.csv", parse_dates=["week_ending"
 # Define features
 # ============================================================
 WEATHER = ["tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-           "extreme_heat", "freeze_risk", "heavy_rain"]
+           "dd_heat", "dd_freeze", "heavy_rain"]
 
 LAGS = ["price_lag1", "price_lag2", "price_lag4",
         "volume_lag1", "volume_lag2",

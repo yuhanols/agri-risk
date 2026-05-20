@@ -29,7 +29,7 @@ mkt["dprice"] = mkt["price"] - mkt["price_lag1"]
 
 WEATHER = [
     "tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-    "extreme_heat", "freeze_risk", "heavy_rain",
+    "dd_heat", "dd_freeze", "heavy_rain",
     "tmax_lag1", "tmax_lag2", "ppt_lag1",
     "tmax_avg_roll4_mean", "ppt_total_roll4_mean",
 ]

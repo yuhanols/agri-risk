@@ -55,8 +55,8 @@ for wk in weeks:
         "coverage": round(coverage, 3),
         "tmax_avg": w_tmax, "tmin_avg": w_tmin, "ppt_total": w_ppt,
         "diurnal_range": (w_tmax - w_tmin) if not np.isnan(w_tmax) else np.nan,
-        "extreme_heat": vol_nz["extreme_heat"].max() if len(vol_nz) > 0 else 0,
-        "freeze_risk": vol_nz["freeze_risk"].max() if len(vol_nz) > 0 else 0,
+        "dd_heat": (v * vol_nz["dd_heat"]).sum() / v.sum() if len(vol_nz) > 0 and vol_nz["vol_romaine"].sum() > 0 else np.nan,
+        "dd_freeze": (v * vol_nz["dd_freeze"]).sum() / v.sum() if len(vol_nz) > 0 and vol_nz["vol_romaine"].sum() > 0 else np.nan,
         "heavy_rain": vol_nz["heavy_rain"].max() if len(vol_nz) > 0 else 0,
     })
 
@@ -94,7 +94,7 @@ ice["dprice"] = ice["price"] - ice["price_lag1"]
 # Features
 # ============================================================
 WEATHER = ["tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-           "extreme_heat", "freeze_risk", "heavy_rain"]
+           "dd_heat", "dd_freeze", "heavy_rain"]
 LAGS = ["price_lag1", "price_lag2", "price_lag4",
         "volume_lag1", "volume_lag2",
         "tmax_lag1", "tmax_lag2", "ppt_lag1"]

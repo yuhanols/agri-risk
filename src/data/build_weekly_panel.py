@@ -133,6 +133,12 @@ weather["district"] = weather["location"].map(WEATHER_DISTRICT_MAP)
 # Create week_ending (Tuesday)
 weather["week_ending"] = weather["date"].dt.to_period("W-TUE").dt.end_time.dt.normalize()
 
+# Degree days (daily, before weekly aggregation)
+# DD_heat: degree days above 40C (cumulative excess heat)
+# DD_freeze: degree days below 0C (cumulative frost severity)
+weather["dd_heat"] = (weather["tmax"] - 40).clip(lower=0)
+weather["dd_freeze"] = (0 - weather["tmin"]).clip(lower=0)
+
 # Weekly aggregation
 weather_weekly = (weather.groupby(["week_ending", "district"])
                   .agg(
@@ -142,6 +148,8 @@ weather_weekly = (weather.groupby(["week_ending", "district"])
                       tmin_min=("tmin", "min"),       # coldest night in week
                       ppt_total=("ppt", "sum"),       # total weekly precip
                       ppt_days=("ppt", lambda x: (x > 0).sum()),  # rainy days
+                      dd_heat=("dd_heat", "sum"),     # weekly degree days >40C
+                      dd_freeze=("dd_freeze", "sum"), # weekly degree days <0C
                       n_weather_days=("tmax", "count"),
                   ).reset_index())
 

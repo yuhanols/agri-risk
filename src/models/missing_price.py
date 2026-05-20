@@ -59,7 +59,7 @@ df["ppt_lag1"] = df.groupby("district")["ppt_total"].shift(1)
 # Define features (NO price lags - we're predicting price)
 # ============================================================
 WEATHER = ["tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-           "extreme_heat", "freeze_risk", "heavy_rain",
+           "dd_heat", "dd_freeze", "heavy_rain",
            "tmax_lag1", "ppt_lag1"]
 
 VOLUME = ["volume", "volume_lag1", "volume_lag2", "volume_roll4"]

@@ -53,7 +53,7 @@ print("MODEL 1: Δprice ~ weather + district FE + season")
 print("=" * 75)
 
 WEATHER = ["tmax_avg", "tmin_avg", "ppt_total", "diurnal_range",
-           "extreme_heat", "freeze_risk", "heavy_rain"]
+           "dd_heat", "dd_freeze", "heavy_rain"]
 DISTRICT_FE = ["d_western_az", "d_imperial"]
 SEASON = ["q1", "q2", "q3"]
 INTERACT = ["az_winter", "az_spring"]
@@ -128,8 +128,8 @@ print("MODEL 5: Δprice ~ weather + transition_week + weather × transition + FE
 print("=" * 75)
 
 dist["transition_week"] = dist["week_of_year"].isin(list(range(15, 21)) + list(range(45, 51))).astype(int)
-dist["freeze_x_transition"] = dist["freeze_risk"] * dist["transition_week"]
-dist["heat_x_transition"] = dist["extreme_heat"] * dist["transition_week"]
+dist["freeze_x_transition"] = dist["dd_freeze"] * dist["transition_week"]
+dist["heat_x_transition"] = dist["dd_heat"] * dist["transition_week"]
 dist["ppt_x_transition"] = dist["ppt_total"] * dist["transition_week"]
 
 TRANSITION = ["transition_week", "freeze_x_transition", "heat_x_transition", "ppt_x_transition"]
