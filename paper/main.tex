@@ -550,7 +550,22 @@ We split the sample into three sub-periods and re-estimate the market-level OLS 
 
 The temperature variables ($tmax$, $tmin$) show sign instability, which likely reflects collinearity between them rather than instability in the underlying relationship. Freeze risk also varies across periods, consistent with its low frequency making it sensitive to individual events within each sub-sample.
 
- tab
+\begin{table}[!htbp]
+\centering
+\caption{Coefficient stability across sub-periods (market-level OLS)}
+\label{tab:stability}
+\begin{tabular}{lrrr}
+\toprule
+Variable & 2010--2015 & 2016--2020 & 2021--2026 \\
+\midrule
+price\_lag1 & 1.218 & 1.153 & 1.517 \\
+ppt\_total & 0.116 & 0.118 & 0.181 \\
+freeze\_risk & 1.682 & $-$1.793 & $-$1.355 \\
+heavy\_rain & $-$2.190 & $-$0.670 & $-$2.181 \\
+extreme\_heat & $-$0.000 & $-$0.000 & $-$0.160 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ------------------------------------------------------------
 \subsection{Missing Price Prediction}
