@@ -11,7 +11,7 @@ RAW = ROOT / "data" / "raw"
 OUT = ROOT / "data" / "processed"
 OUT.mkdir(parents=True, exist_ok=True)
 
-OLD_FILE = Path("/Users/yuhan/Library/CloudStorage/GoogleDrive-redacted-user/My Drive/UCD/Lettuce/Lettuce_2010_2021.csv")
+OLD_FILE = RAW / "lettuce_2010_2021.csv"
 NEW_FILE = RAW / "usda_ams_truck_lettuce_az_ca_2022_2026.csv"
 
 # --- Load old data (2010-2021) ---

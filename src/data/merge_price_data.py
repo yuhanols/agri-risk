@@ -16,9 +16,9 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 # Also include the earlier downloads
 EXTRA_FILES = [
-    Path("data/raw/price/AMS_sc_shippingpt_daily_20260422-004557.csv"),  # 2010
-    Path("data/raw/price/AMS_sc_shippingpt_daily_20260422-004531.csv"),  # 2026 Mar-Apr
-    Path("data/raw/price/AMS_sc_shippingpt_daily_20260422-003353.csv"),  # 2026 Apr 16-17
+    PRICE_DIR / "AMS_sc_shippingpt_daily_20260422-004557.csv",  # 2010
+    PRICE_DIR / "AMS_sc_shippingpt_daily_20260422-004531.csv",  # 2026 Mar-Apr
+    PRICE_DIR / "AMS_sc_shippingpt_daily_20260422-003353.csv",  # 2026 Apr 16-17
 ]
 
 # Districts we care about (AZ + CA)
