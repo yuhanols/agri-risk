@@ -148,7 +148,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Explore the project interactively: see `notebooks/walkthrough.ipynb` for a guided tour of the key results.
+Run the data pipeline and models from `src/`, then generate figures with `src/viz/plot_results.py`.
 
 ## Requirements
 
